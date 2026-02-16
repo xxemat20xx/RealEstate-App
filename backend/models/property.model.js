@@ -14,6 +14,9 @@ const propertySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    map: {
+      type: String,
+    },
     bathrooms: {
       type: Number,
       required: true,
@@ -66,7 +69,7 @@ const propertySchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["available", "pending", "sold"],
+      enum: ["available", "pending", "sold", "ongoing"],
       required: true,
     },
     agent: {
