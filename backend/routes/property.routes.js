@@ -7,6 +7,8 @@ import {
   getProperty,
 } from "../controller/property.controller.js";
 
+// import { verifyToken, adminOnly } from "../middleware/verifyToken.js";
+
 const router = express.Router();
 
 router.post("/create", createProperty);

@@ -7,6 +7,7 @@ import { connectDB } from "./lib/db.js";
 
 // routes
 import propertyRoutes from "./routes/property.routes.js";
+import userRoutes from "./routes/user.routes.js";
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use(cookieParser());
 
 // routes
 app.use("/api/properties", propertyRoutes);
+app.use("/api/users", userRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
