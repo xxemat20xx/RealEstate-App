@@ -1,11 +1,43 @@
 import React, { useEffect, useState } from 'react'
 import { usePropertyStore } from '../store/usePropertyStore'
+import AdminPreviewModal from '../components/AdminPreviewModal';
+import PropertyForm from '../components/PropertyForm';
+
 const AdminPanel = () => {
- const { properties, fetchProperties, createProperty, updateProperty, deleteProperty } = usePropertyStore();
+ const { properties, fetchProperties, addProperty, updateProperty, deleteProperty } = usePropertyStore();
  const [isAdding, setIsAdding] = useState(false);
+ const [previewProperty, setPreviewProperty] = useState(null);
+ const [editingProperty, setEditingProperty] = useState(null);
  useEffect(() => {
   fetchProperties();
  }, [fetchProperties]);
+ 
+//  add
+const handleAddProperty = () => {
+    setEditingProperty(null);
+    setIsAdding(true);
+}
+
+// update
+const handleUpdateProperty = (property) => {
+  setEditingProperty(property);
+  setIsAdding(true);
+}
+
+// delete
+const handleDeleteProperty = async(id) => {
+  try {
+    if(window.confirm("Are you sure you want to delete this property?")){
+      await deleteProperty(id);
+      fetchProperties();
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
+}
+
+
 
  return (
      <div className="fixed inset-0 z-[80] bg-white flex flex-col animate-in fade-in duration-300">
@@ -89,7 +121,7 @@ const AdminPanel = () => {
                             <td className="px-8 py-6 text-right">
                             <div className="flex justify-end gap-3 opacity-40 group-hover:opacity-100 transition-opacity">
                                 <button 
-                                
+                                onClick={() => setPreviewProperty(property)}
                                 className="bg-white border border-slate-200 p-3 rounded-xl text-slate-500 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm"
                                 title="Preview Mode"
                                 >
@@ -104,6 +136,7 @@ const AdminPanel = () => {
                                 </button>
 
                                 <button 
+                                onClick={() => handleDeleteProperty(property._id)}
                                 className="bg-white border border-slate-200 p-3 rounded-xl text-slate-500 hover:text-red-600 hover:border-red-200 transition-all shadow-sm"
                                 title="De-list Asset"
                                 >
@@ -118,6 +151,48 @@ const AdminPanel = () => {
            </div>
         </div>
       </div>
+      {/* isAdding or editingPropert */}
+      {(isAdding || editingProperty) && (
+      <PropertyForm
+        property={editingProperty ?? null}
+        onSave={async (p) => {
+          try {
+            const formData = new FormData();
+            Object.keys(p).forEach(key => {
+              if (key === "images") {
+                p.images.forEach(file => formData.append("images", file)); // append each file
+              } else if (Array.isArray(p[key])) {
+                p[key].forEach(item => formData.append(key, item)); // handle arrays like amenities
+              } else {
+                formData.append(key, p[key]);
+              }
+            });
+
+            if (editingProperty) {
+              await updateProperty(editingProperty._id, formData);
+            } else {
+              await addProperty(formData);
+            }
+            fetchProperties();
+            setIsAdding(false);
+            setEditingProperty(null);
+          } catch (err) {
+            console.log(err);
+          }
+        }}
+        onCancel={() => {
+          setIsAdding(false);
+          setEditingProperty(null);
+        }}
+      />
+
+      )}
+
+
+      {/* Preview Modal */}
+      {previewProperty && (
+        <AdminPreviewModal property={previewProperty} onClose={() => setPreviewProperty(null)} />
+      )}
      </div>
   )
 }

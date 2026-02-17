@@ -14,8 +14,9 @@ const propertySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    map: {
+    mapUrl: {
       type: String,
+      required: true,
     },
     bathrooms: {
       type: Number,
@@ -35,11 +36,9 @@ const propertySchema = new mongoose.Schema(
     },
     lotSize: {
       type: Number,
-      required: true,
     },
     yearBuilt: {
       type: Number,
-      required: true,
     },
     price: {
       type: Number,
@@ -69,16 +68,14 @@ const propertySchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["available", "pending", "sold", "ongoing"],
+      enum: ["available", "sold", "ongoing construction", "under renovation"],
       required: true,
     },
     agent: {
       type: String,
-      required: true,
     },
     virtualTourUrl: {
       type: String,
-      required: true,
     },
   },
   { timestamps: true },

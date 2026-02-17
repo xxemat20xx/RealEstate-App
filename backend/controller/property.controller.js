@@ -7,9 +7,7 @@ export const createProperty = async (req, res) => {
       title,
       description,
       address,
-      city,
-      state,
-      zip,
+      mapUrl,
       price,
       bedrooms,
       bathrooms,
@@ -19,33 +17,43 @@ export const createProperty = async (req, res) => {
       yearBuilt,
       unitType,
       listingType,
-      images,
       amenities,
       status,
       agent,
       virtualTourUrl,
     } = req.body;
 
-    // Upload images to Cloudinary
     const uploadedImages = [];
-    const uploadedImageIds = []; // <-- store public_id for deletion
+    const uploadedImageIds = [];
 
-    for (const image of images) {
-      const result = await cloudinary.uploader.upload(image, {
-        folder: "properties",
+    // 🔥 Files now come from req.files
+    for (const file of req.files) {
+      const result = await new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream(
+            {
+              folder: "properties",
+              resource_type: "image",
+              quality: "auto",
+              fetch_format: "auto",
+            },
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result);
+            },
+          )
+          .end(file.buffer);
       });
+
       uploadedImages.push(result.secure_url);
       uploadedImageIds.push(result.public_id);
     }
 
-    // Save property in MongoDB with both secure URLs and public IDs
     const property = new Property({
       title,
       description,
       address,
-      city,
-      state,
-      zip,
+      mapUrl,
       price,
       bedrooms,
       bathrooms,
@@ -57,7 +65,7 @@ export const createProperty = async (req, res) => {
       listingType,
       images: uploadedImages,
       imageIds: uploadedImageIds,
-      amenities,
+      amenities: amenities || [],
       status,
       agent,
       virtualTourUrl,
@@ -71,6 +79,7 @@ export const createProperty = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 export const updateProperty = async (req, res) => {
   const { id } = req.params;
   try {

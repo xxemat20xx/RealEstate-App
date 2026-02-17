@@ -19,7 +19,7 @@ export const usePropertyStore = create((set) => ({
   addProperty: async (property) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await api.post("/properties/add", property);
+      const response = await api.post("/properties/create", property);
       set((state) => ({
         properties: [...state.properties, response.data],
         isLoading: false,

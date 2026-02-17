@@ -6,14 +6,15 @@ import {
   getProperties,
   getProperty,
 } from "../controller/property.controller.js";
+import { upload } from "../middleware/multer.js";
 
 // import { verifyToken, adminOnly } from "../middleware/verifyToken.js";
 
 const router = express.Router();
 
-router.post("/create", createProperty);
+router.post("/create", upload.array("images"), createProperty);
 router.delete("/delete/:id", deleteProperty);
-router.put("/update/:id", updateProperty);
+router.put("/update/:id", upload.array("images"), updateProperty);
 router.get("/get", getProperties);
 router.get("/get/:id", getProperty);
 
