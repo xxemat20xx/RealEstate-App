@@ -84,29 +84,31 @@ export const updateProperty = async (req, res) => {
   const { id } = req.params;
 
   try {
+    // Find the property by ID
     const property = await Property.findById(id);
     if (!property)
       return res.status(404).json({ message: "Property not found" });
 
-    // 1️⃣ DELETE only selected images
-    const deletedImageIds = req.body.deletedImageIds || [];
+    // 1️⃣ DELETE images from Cloudinary
+    const deletedImageIds = req.body.deletedImageIds || []; // These are the image publicIds that should be deleted
 
-    // Ensure imageIds is initialized
-    property.imageIds = property.imageIds || [];
+    if (deletedImageIds.length > 0) {
+      // Loop through the imageIds and remove them from Cloudinary
+      for (const publicId of deletedImageIds) {
+        const result = await cloudinary.uploader.destroy(publicId);
+        console.log(`Cloudinary Image Deleted: ${result}`);
+      }
 
-    for (const publicId of deletedImageIds) {
-      await cloudinary.uploader.destroy(publicId);
+      // 2️⃣ Remove the images from the property record
+      property.imageIds = property.imageIds.filter(
+        (publicId) => !deletedImageIds.includes(publicId),
+      );
+      property.images = property.images.filter(
+        (url) => !deletedImageIds.some((id) => url.includes(id)), // Assuming the URL contains the Cloudinary public ID
+      );
     }
 
-    // Remove deleted from DB arrays
-    property.images = property.images.filter(
-      (_, index) => !deletedImageIds.includes(property.imageIds[index]),
-    );
-    property.imageIds = property.imageIds.filter(
-      (publicId) => !deletedImageIds.includes(publicId),
-    );
-
-    // 2️⃣ UPLOAD new images (if any)
+    // 3️⃣ UPLOAD new images (if any)
     const uploadedImages = [];
     const uploadedImageIds = [];
 
@@ -117,10 +119,10 @@ export const updateProperty = async (req, res) => {
             cloudinary.uploader
               .upload_stream(
                 {
-                  folder: "properties",
-                  resource_type: "image",
-                  quality: "auto",
-                  fetch_format: "auto",
+                  folder: "properties", // Folder in Cloudinary
+                  resource_type: "image", // Type of resource
+                  quality: "auto", // Quality setting
+                  fetch_format: "auto", // Automatic format based on browser's capabilities
                 },
                 (error, result) => {
                   if (error) reject(error);
@@ -138,11 +140,12 @@ export const updateProperty = async (req, res) => {
         }
       }
 
+      // Append the newly uploaded images to the database
       property.images.push(...uploadedImages);
       property.imageIds.push(...uploadedImageIds);
     }
 
-    // 3️⃣ Update other fields safely
+    // 4️⃣ Update other fields of the property
     const {
       title,
       description,
@@ -166,6 +169,7 @@ export const updateProperty = async (req, res) => {
     if (isNaN(price))
       return res.status(400).json({ message: "Invalid price value" });
 
+    // Assign the updated values to the property document
     Object.assign(property, {
       title,
       description,
@@ -186,9 +190,10 @@ export const updateProperty = async (req, res) => {
       mapUrl,
     });
 
+    // Save the updated property
     await property.save();
 
-    res.status(200).json(property);
+    return res.status(200).json(property); // Return the updated property to the frontend
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message });
