@@ -61,12 +61,12 @@ export const createProperty = async (req, res) => {
       sqft,
       lotSize,
       yearBuilt,
-      unitType,
-      listingType,
+      unitType: unitType || "apartment",
+      listingType: listingType || "sale",
       images: uploadedImages,
       imageIds: uploadedImageIds,
       amenities: amenities || [],
-      status,
+      status: status || "available",
       agent,
       virtualTourUrl,
     });
@@ -82,51 +82,79 @@ export const createProperty = async (req, res) => {
 
 export const updateProperty = async (req, res) => {
   const { id } = req.params;
+
   try {
-    //fetch property
     const property = await Property.findById(id);
     if (!property)
       return res.status(404).json({ message: "Property not found" });
 
-    //delete old images
-    for (const publicId of property.imageIds) {
+    // 1️⃣ DELETE only selected images
+    const deletedImageIds = req.body.deletedImageIds || [];
+
+    for (const publicId of deletedImageIds) {
       await cloudinary.uploader.destroy(publicId);
     }
 
-    //upload new images
+    // Remove deleted from DB arrays
+    property.images = property.images.filter(
+      (_, index) => !deletedImageIds.includes(property.imageIds[index]),
+    );
+
+    property.imageIds = property.imageIds.filter(
+      (publicId) => !deletedImageIds.includes(publicId),
+    );
+
+    // 2️⃣ UPLOAD new images (if any)
     const uploadedImages = [];
     const uploadedImageIds = [];
 
-    for (const image of req.body.images) {
-      const result = await cloudinary.uploader.upload(image, {
-        folder: "properties",
-      });
-      uploadedImages.push(result.secure_url);
-      uploadedImageIds.push(result.public_id);
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const result = await new Promise((resolve, reject) => {
+          cloudinary.uploader
+            .upload_stream(
+              {
+                folder: "properties",
+                resource_type: "image",
+                quality: "auto",
+                fetch_format: "auto",
+              },
+              (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+              },
+            )
+            .end(file.buffer);
+        });
+
+        uploadedImages.push(result.secure_url);
+        uploadedImageIds.push(result.public_id);
+      }
+
+      property.images.push(...uploadedImages);
+      property.imageIds.push(...uploadedImageIds);
     }
 
-    //update property
-    property.title = req.body.title;
-    property.description = req.body.description;
-    property.address = req.body.address;
-    property.city = req.body.city;
-    property.state = req.body.state;
-    property.zip = req.body.zip;
-    property.price = req.body.price;
-    property.bedrooms = req.body.bedrooms;
-    property.bathrooms = req.body.bathrooms;
-    property.parking = req.body.parking;
-    property.sqft = req.body.sqft;
-    property.lotSize = req.body.lotSize;
-    property.yearBuilt = req.body.yearBuilt;
-    property.unitType = req.body.unitType;
-    property.listingType = req.body.listingType;
-    property.images = uploadedImages;
-    property.imageIds = uploadedImageIds;
-    property.amenities = req.body.amenities;
-    property.status = req.body.status;
-    property.agent = req.body.agent;
-    property.virtualTourUrl = req.body.virtualTourUrl;
+    // 3️⃣ Update other fields safely
+    Object.assign(property, {
+      title: req.body.title,
+      description: req.body.description,
+      address: req.body.address,
+      price: req.body.price,
+      bedrooms: req.body.bedrooms,
+      bathrooms: req.body.bathrooms,
+      parking: req.body.parking,
+      sqft: req.body.sqft,
+      lotSize: req.body.lotSize,
+      yearBuilt: req.body.yearBuilt,
+      unitType: req.body.unitType || property.unitType || "apartment",
+      listingType: req.body.listingType || property.listingType || "sale",
+      amenities: req.body.amenities,
+      status: req.body.status || property.status || "available",
+      agent: req.body.agent,
+      virtualTourUrl: req.body.virtualTourUrl,
+      mapUrl: req.body.mapUrl,
+    });
 
     await property.save();
 
@@ -136,6 +164,7 @@ export const updateProperty = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 export const deleteProperty = async (req, res) => {
   try {
     const property = await Property.findById(req.params.id);
@@ -157,6 +186,7 @@ export const deleteProperty = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 export const getProperties = async (req, res) => {
   // get all
   try {
