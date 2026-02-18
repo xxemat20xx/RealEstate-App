@@ -91,6 +91,9 @@ export const updateProperty = async (req, res) => {
     // 1️⃣ DELETE only selected images
     const deletedImageIds = req.body.deletedImageIds || [];
 
+    // Ensure imageIds is initialized
+    property.imageIds = property.imageIds || [];
+
     for (const publicId of deletedImageIds) {
       await cloudinary.uploader.destroy(publicId);
     }
@@ -99,7 +102,6 @@ export const updateProperty = async (req, res) => {
     property.images = property.images.filter(
       (_, index) => !deletedImageIds.includes(property.imageIds[index]),
     );
-
     property.imageIds = property.imageIds.filter(
       (publicId) => !deletedImageIds.includes(publicId),
     );
@@ -110,25 +112,30 @@ export const updateProperty = async (req, res) => {
 
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
-        const result = await new Promise((resolve, reject) => {
-          cloudinary.uploader
-            .upload_stream(
-              {
-                folder: "properties",
-                resource_type: "image",
-                quality: "auto",
-                fetch_format: "auto",
-              },
-              (error, result) => {
-                if (error) reject(error);
-                else resolve(result);
-              },
-            )
-            .end(file.buffer);
-        });
+        try {
+          const result = await new Promise((resolve, reject) => {
+            cloudinary.uploader
+              .upload_stream(
+                {
+                  folder: "properties",
+                  resource_type: "image",
+                  quality: "auto",
+                  fetch_format: "auto",
+                },
+                (error, result) => {
+                  if (error) reject(error);
+                  else resolve(result);
+                },
+              )
+              .end(file.buffer);
+          });
 
-        uploadedImages.push(result.secure_url);
-        uploadedImageIds.push(result.public_id);
+          uploadedImages.push(result.secure_url);
+          uploadedImageIds.push(result.public_id);
+        } catch (error) {
+          console.error(`Error uploading image: ${error}`);
+          return res.status(500).json({ message: "Error uploading image" });
+        }
       }
 
       property.images.push(...uploadedImages);
@@ -136,24 +143,47 @@ export const updateProperty = async (req, res) => {
     }
 
     // 3️⃣ Update other fields safely
+    const {
+      title,
+      description,
+      address,
+      price,
+      bedrooms,
+      bathrooms,
+      parking,
+      sqft,
+      lotSize,
+      yearBuilt,
+      unitType,
+      listingType,
+      amenities,
+      status,
+      agent,
+      virtualTourUrl,
+      mapUrl,
+    } = req.body;
+
+    if (isNaN(price))
+      return res.status(400).json({ message: "Invalid price value" });
+
     Object.assign(property, {
-      title: req.body.title,
-      description: req.body.description,
-      address: req.body.address,
-      price: req.body.price,
-      bedrooms: req.body.bedrooms,
-      bathrooms: req.body.bathrooms,
-      parking: req.body.parking,
-      sqft: req.body.sqft,
-      lotSize: req.body.lotSize,
-      yearBuilt: req.body.yearBuilt,
-      unitType: req.body.unitType || property.unitType || "apartment",
-      listingType: req.body.listingType || property.listingType || "sale",
-      amenities: req.body.amenities,
-      status: req.body.status || property.status || "available",
-      agent: req.body.agent,
-      virtualTourUrl: req.body.virtualTourUrl,
-      mapUrl: req.body.mapUrl,
+      title,
+      description,
+      address,
+      price,
+      bedrooms,
+      bathrooms,
+      parking,
+      sqft,
+      lotSize,
+      yearBuilt,
+      unitType: unitType || property.unitType || "apartment",
+      listingType: listingType || property.listingType || "sale",
+      amenities,
+      status: status || property.status || "available",
+      agent,
+      virtualTourUrl,
+      mapUrl,
     });
 
     await property.save();
