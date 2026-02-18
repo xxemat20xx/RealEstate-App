@@ -12,20 +12,13 @@ const AdminPanel = () => {
   fetchProperties();
  }, [fetchProperties]);
  
-//  add
-const handleAddProperty = () => {
-    setEditingProperty(null);
-    setIsAdding(true);
-}
 
 // update
 const handleUpdateProperty = (property) => {
 
   setEditingProperty(property);
   setIsAdding(true);
-  console.log(property);
-  // set preview image
-  
+
 }
 
 // delete

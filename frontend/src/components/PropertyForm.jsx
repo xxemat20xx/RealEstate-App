@@ -47,11 +47,21 @@ const PropertyForm = ( { property, onSave, onCancel } ) => {
     });
   };
 
-  useEffect(() => {
+    useEffect(() => {
     if (property) {
-      setFormData(property);
+        // Create previews for existing images if editing
+        const imagesWithPreviews = property.images.map((image) => ({
+        file: null, // No file because it's from the server
+        preview: image, // Use the image URL as the preview
+        }));
+
+        setFormData({
+        ...property,
+        images: imagesWithPreviews, // Ensure previews are set for existing images
+        });
     }
-  }, [property]);
+    }, [property]);
+
 
   const handleSubmit = async(e) => { 
     e.preventDefault();
