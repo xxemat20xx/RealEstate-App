@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { UploadCloud, X, Bed, Bath, Car, LandPlot, CalendarCheck, Trash, SquaresUnite } from 'lucide-react';
 
 const PropertyForm = ( { property, onSave, onCancel } ) => {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -34,10 +35,10 @@ const PropertyForm = ( { property, onSave, onCancel } ) => {
       lotSize: '',
       sqft: '',
       address: '',
-      listingType: '',
-      unitType: '',
+      listingType: 'sale',
+      unitType: 'house',
       yearBuilt: '',
-      status: '',
+      status: 'available',
       amenities: [],
       images: [],
       imageIds: [],
@@ -52,11 +53,20 @@ const PropertyForm = ( { property, onSave, onCancel } ) => {
     }
   }, [property]);
 
-  const handleSubmit = (e) => { 
+  const handleSubmit = async(e) => { 
     e.preventDefault();
-    onSave(formData);
-    clearFormData();
-    console.log(formData)
+    try {
+        setLoading(true);
+
+        await onSave(formData);
+
+        clearFormData();// only clear after success
+
+    } catch (error) {
+        console.error("Error saving property:", error);
+    } finally {
+        setLoading(false);
+    }
   };
   
     //handle cancel
@@ -67,22 +77,39 @@ const PropertyForm = ( { property, onSave, onCancel } ) => {
 
     // Handle multiple image uploads and preview
     const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files); // keep File objects
+    const files = Array.from(e.target.files);
+
+    const newImages = files.map(file => ({
+        file,
+        preview: URL.createObjectURL(file),
+    }));
+
     setFormData(prev => ({
         ...prev,
-        images: [...prev.images, ...files], // store File objects
+        images: [...prev.images, ...newImages],
     }));
     };
 
 
     // Optional: remove an image from the preview
     const handleRemoveImage = (index) => {
-    setFormData((prev) => ({
+    setFormData(prev => {
+        const updated = [...prev.images];
+
+        // Only revoke if preview exists
+        if (updated[index]?.preview) {
+        URL.revokeObjectURL(updated[index].preview);
+        }
+
+        updated.splice(index, 1);
+
+        return {
         ...prev,
-        images: prev.images.filter((_, i) => i !== index),
-        imageIds: prev.imageIds.filter((_, i) => i !== index),
-    }));
+        images: updated,
+        };
+    });
     };
+
     // 
     const ImageUploadButton = ({ onFilesSelected }) => {
     const fileInputRef = useRef(null);
@@ -394,22 +421,26 @@ const PropertyForm = ( { property, onSave, onCancel } ) => {
                         <ImageUploadButton onFilesSelected={handleImageUpload} />
 
                         {/* Image previews */}
-                        {formData.images.length > 0 && (
-                            <div className="flex flex-wrap gap-4 mt-4">
                             {formData.images.map((img, index) => (
-                                <div key={index} className="relative w-24 h-24 rounded-xl overflow-hidden border border-slate-200 shadow-sm">
-                                <img src={img} alt={`preview-${index}`} className="object-cover w-full h-full" />
+                            <div
+                                key={index}
+                                className="relative w-24 h-24 rounded-xl overflow-hidden border border-slate-200 shadow-sm"
+                            >
+                                <img
+                                src={img.preview}
+                                alt={`preview-${index}`}
+                                className="object-cover w-full h-full"
+                                />
+
                                 <button
-                                    type="button"
-                                    onClick={() => handleRemoveImage(index)}
-                                    className="absolute top-1 right-1 bg-white/80 rounded-full p-1 hover:bg-red-500 hover:text-white transition-colors"
+                                type="button"
+                                onClick={() => handleRemoveImage(index)}
+                                className="absolute top-1 right-1 bg-white/80 rounded-full p-1 hover:bg-red-500 hover:text-white transition-colors"
                                 >
-                                    <X size={16} />
+                                <X size={16} />
                                 </button>
-                                </div>
-                            ))}
                             </div>
-                        )}
+                            ))}
                         </div>
                   </section>
                   {/* ------------------ SECTION VI: Marketing Description -------------------------- */}
@@ -431,11 +462,27 @@ const PropertyForm = ( { property, onSave, onCancel } ) => {
             <button onClick={onCancel} className="px-8 py-4 rounded-xl font-bold text-slate-400 hover:text-slate-900 transition-colors uppercase text-xs tracking-widest">
                 Discard
             </button>
-            <button 
+            <button
+            type="submit"
+            disabled={loading}
             onClick={handleSubmit}
-            type="submit" 
-            className="bg-slate-900 text-white px-12 py-4 rounded-xl font-bold shadow-2xl hover:bg-amber-600 transition-all transform active:scale-95 uppercase text-xs tracking-widest">
-                Publish Asset
+            className={`relative flex items-center justify-center px-12 py-4 rounded-xl 
+                font-bold uppercase text-xs tracking-widest transition-all duration-300
+                overflow-hidden
+                ${loading 
+                ? "bg-slate-900 cursor-not-allowed" 
+                : "bg-slate-900 hover:bg-amber-600 active:scale-95"}`}
+            >
+            {loading && (
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-[shimmer_1.5s_linear_infinite]" />
+            )}
+
+            <span className="relative flex items-center gap-3 text-white">
+                {loading && (
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                )}
+                {loading ? "Publishing..." : "Publish Asset"}
+            </span>
             </button>
             </div>
         </div>
