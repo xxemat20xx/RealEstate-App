@@ -3,6 +3,7 @@ import { UploadCloud, X, Bed, Bath, Car, LandPlot, CalendarCheck, Trash, Squares
 
 const PropertyForm = ( { property, onSave, onCancel } ) => {
   const [loading, setLoading] = useState(false);
+  const [deletedImageIds, setDeletedImageIds] = useState([]);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -49,18 +50,20 @@ const PropertyForm = ( { property, onSave, onCancel } ) => {
 
     useEffect(() => {
     if (property) {
-        // Create previews for existing images if editing
-        const imagesWithPreviews = property.images.map((image) => ({
-        file: null, // No file because it's from the server
-        preview: image, // Use the image URL as the preview
+        const imagesWithPreviews = property.images.map((image, index) => ({
+        file: null,
+        preview: image,
+        existing: true,                // mark as existing
+        public_id: property.imageIds[index],   // VERY IMPORTANT
         }));
 
         setFormData({
         ...property,
-        images: imagesWithPreviews, // Ensure previews are set for existing images
+        images: imagesWithPreviews,
         });
     }
     }, [property]);
+
 
 
   const handleSubmit = async(e) => { 
@@ -68,9 +71,12 @@ const PropertyForm = ( { property, onSave, onCancel } ) => {
     try {
         setLoading(true);
 
-        await onSave(formData);
+        await onSave(formData, deletedImageIds);
 
-        clearFormData();// only clear after success
+
+        setDeletedImageIds([]);
+        clearFormData();
+
 
     } catch (error) {
         console.error("Error saving property:", error);
@@ -103,21 +109,24 @@ const PropertyForm = ( { property, onSave, onCancel } ) => {
 
     // Optional: remove an image from the preview
     const handleRemoveImage = (index) => {
-    setFormData(prev => {
-        const updated = [...prev.images];
+        setFormData(prev => {
+            const updated = [...prev.images];
+            const removed = updated[index];
 
-        // Only revoke if preview exists
-        if (updated[index]?.preview) {
-        URL.revokeObjectURL(updated[index].preview);
-        }
+            if(removed?.public_id){
+                setDeletedImageIds(prev => [...prev, removed.public_id]);
+            }
+            if(removed?.preview && removed.file){
+                URL.revokeObjectURL(removed.preview);
+            }
+             updated.splice(index, 1);
 
-        updated.splice(index, 1);
 
-        return {
-        ...prev,
-        images: updated,
-        };
-    });
+            return {
+                ...prev,
+                images: updated,
+            }
+        })
     };
 
     // 

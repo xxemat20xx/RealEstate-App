@@ -40,17 +40,33 @@ export const usePropertyStore = create((set) => ({
       set({ error: error.message, isLoading: false });
     }
   },
-  updateProperty: async (id, formData) => {
+  updateProperty: async (id, propertyData, deletedImageIds) => {
     set({ isLoading: true, error: null });
+
     try {
-      // Make the PUT request with formData as the request body
-      const response = await api.put(`/properties/update/${id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data", // Ensure the correct content type for FormData
-        },
+      const formData = new FormData();
+
+      // append normal fields
+      Object.keys(propertyData).forEach((key) => {
+        if (key !== "images") {
+          formData.append(key, propertyData[key]);
+        }
       });
 
-      // Update the state with the response data
+      // append new images only
+      propertyData.images.forEach((img) => {
+        if (img.file) {
+          formData.append("images", img.file);
+        }
+      });
+
+      // ✅ append deleted image IDs properly
+      deletedImageIds.forEach((id) => {
+        formData.append("deletedImageIds", id);
+      });
+
+      const response = await api.put(`/properties/update/${id}`, formData);
+
       set((state) => ({
         properties: state.properties.map((property) =>
           property._id === id ? response.data : property,
@@ -58,7 +74,6 @@ export const usePropertyStore = create((set) => ({
         isLoading: false,
       }));
     } catch (error) {
-      // Handle errors and update the loading state
       set({ error: error.message, isLoading: false });
     }
   },

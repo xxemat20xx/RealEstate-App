@@ -82,18 +82,21 @@ export const createProperty = async (req, res) => {
 
 export const updateProperty = async (req, res) => {
   const { id } = req.params;
+  console.log("Deleted Image IDs:", req.body.deletedImageIds);
   try {
-    // Check if images are being passed correctly
-    console.log("Received Images:", req.files);
-    console.log("Received Body:", req.body);
-
     // Find the property by ID
     const property = await Property.findById(id);
     if (!property)
       return res.status(404).json({ message: "Property not found" });
 
     // Handle deleted images
-    const deletedImageIds = req.body.deletedImageIds || [];
+    let deletedImageIds = [];
+
+    if (req.body.deletedImageIds) {
+      deletedImageIds = Array.isArray(req.body.deletedImageIds)
+        ? req.body.deletedImageIds
+        : [req.body.deletedImageIds];
+    }
 
     if (deletedImageIds.length > 0) {
       for (const publicId of deletedImageIds) {

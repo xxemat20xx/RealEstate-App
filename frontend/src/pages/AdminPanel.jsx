@@ -152,31 +152,22 @@ const handleDeleteProperty = async(id) => {
       {(isAdding || editingProperty) && (
       <PropertyForm
         property={editingProperty ?? null}
-        onSave={async (p) => {
+        onSave={async (formData, deletedImageIds) => {
           try {
-            const formData = new FormData();
-            Object.keys(p).forEach(key => {
-              if (key === "images") {
-               p.images.forEach(img => {
-                  if (img.file instanceof File) {
-                    formData.append("images", img.file);
-                  }
-                });
-              } else if (Array.isArray(p[key])) {
-                p[key].forEach(item => formData.append(key, item)); // handle arrays like amenities
-              } else {
-                formData.append(key, p[key]);
-              }
-            });
-
             if (editingProperty) {
-              await updateProperty(editingProperty._id, formData);
+              await updateProperty(
+                editingProperty._id,
+                formData,
+                deletedImageIds
+              );
             } else {
               await addProperty(formData);
             }
-            fetchProperties();
+
+            await fetchProperties();
             setIsAdding(false);
             setEditingProperty(null);
+
           } catch (err) {
             console.log(err);
           }
@@ -186,8 +177,8 @@ const handleDeleteProperty = async(id) => {
           setEditingProperty(null);
         }}
       />
+    )}
 
-      )}
 
       {/* Preview Modal */}
       {previewProperty && (
