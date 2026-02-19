@@ -440,7 +440,8 @@ const PropertyForm = ( { property, onSave, onCancel } ) => {
                         <ImageUploadButton onFilesSelected={handleImageUpload} />
 
                         {/* Image previews */}
-                            {formData.images.map((img, index) => (
+                        <div className="flex flex-row gap-4 flex-wrap">
+                                                        {formData.images.map((img, index) => (
                             <div
                                 key={index}
                                 className="relative w-24 h-24 rounded-xl overflow-hidden border border-slate-200 shadow-sm"
@@ -460,6 +461,8 @@ const PropertyForm = ( { property, onSave, onCancel } ) => {
                                 </button>
                             </div>
                             ))}
+                        </div>
+
                         </div>
                   </section>
                   {/* ------------------ SECTION VI: Marketing Description -------------------------- */}
