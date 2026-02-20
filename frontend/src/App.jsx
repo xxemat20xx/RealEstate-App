@@ -3,19 +3,14 @@ import { useAuthStore } from './store/useAuthStore'
 
 //pages
 import AdminPanel from './pages/AdminPanel';
+import Homepage from './pages/Homepage';
 
 const App = () => {
-  // const { user, isAuthenticated, isLoading, error, login, logout, checkAuth } = useAuthStore();
-  // useEffect(() => {
-  //   checkAuth();
-  // }, []);
-  
-  // if(isLoading){
-  //   return <div>Loading...</div>
-  // }
 
   return (
-    <AdminPanel />
+    // <AdminPanel />
+    <Homepage />
+    
   )
 }
 
