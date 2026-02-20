@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import {X, Bed, Bath, Car, LandPlot, SquaresUnite } from 'lucide-react';
 
 const FeatureIcon = ({ feature }) => {
   const f = feature.toLowerCase();
@@ -28,8 +28,7 @@ const FeatureIcon = ({ feature }) => {
 };
 
 const PropertyCard = ({ property, onClick }) => {
-  const [showAllFeatures, setShowAllFeatures] = useState(false);
-
+  
   const getLabelStyles = (label) => {
     switch (label) {
       case 'For Rent':
@@ -42,16 +41,9 @@ const PropertyCard = ({ property, onClick }) => {
     }
   };
 
-  const handleToggleFeatures = (e) => {
-    e.stopPropagation();
-    setShowAllFeatures(!showAllFeatures);
-  };
 
-  const features = property.features || [];
-
-  const displayedFeatures = showAllFeatures
-    ? features
-    : features.slice(0, 5);
+  const displayAmentinies = property.amenities.slice(0, 5);
+  const { bedrooms, bathrooms, sqft, parking } = property;
 
   return (
     <div
@@ -69,16 +61,16 @@ const PropertyCard = ({ property, onClick }) => {
 
         <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
           <div className="bg-white/95 backdrop-blur px-3 py-1 rounded text-[10px] font-black uppercase">
-            {property.type}
+            {property.unitType}
           </div>
-          <div className={`px-3 py-1 rounded text-[10px] font-black uppercase ${getLabelStyles(property.listingLabel)}`}>
-            {property.listingLabel}
+          <div className={`px-3 py-1 rounded text-[10px] font-black uppercase ${getLabelStyles(property.listingType)}`}>
+            {property.listingType}
           </div>
         </div>
 
         <div className="absolute bottom-4 left-4 text-white font-bold text-2xl z-10">
           ${property.price?.toLocaleString()}
-          {property.listingLabel === 'For Rent' && (
+          {property.listingType === 'rent' && (
             <span className="text-sm font-normal ml-1 opacity-90">/mo</span>
           )}
         </div>
@@ -89,35 +81,49 @@ const PropertyCard = ({ property, onClick }) => {
           <h3 className="text-xl font-bold mb-1">{property.title}</h3>
 
           <p className="text-slate-500 text-sm mb-4">
-            {property.location}
+            {property.address}
           </p>
-
           <div className="flex flex-wrap gap-2 mb-6">
-            {displayedFeatures?.map((feature, i) => (
+            {bedrooms && (
+              <span className="flex items-center gap-1 bg-slate-50 text-slate-500 px-2 py-1 rounded text-[10px] font-medium uppercase">
+                <Bed className="w-4 h-4" />
+                {bedrooms} beds
+              </span>
+            )}
+            {bathrooms && (
+              <span className="flex items-center gap-1 bg-slate-50 text-slate-500 px-2 py-1 rounded text-[10px] font-medium uppercase">
+                <Bath className="w-4 h-4" />
+                {bathrooms} baths
+              </span>
+            )}
+            {sqft && (
+              <span className="flex items-center gap-1 bg-slate-50 text-slate-500 px-2 py-1 rounded text-[10px] font-medium uppercase">
+                <SquaresUnite className="w-4 h-4" />
+                {sqft} sqft
+              </span>
+            )}
+            {parking > 0 && (
+              <span className="flex items-center gap-1 bg-slate-50 text-slate-500 px-2 py-1 rounded text-[10px] font-medium uppercase">
+                <Car className="w-4 h-4" />
+                {parking} parking
+              </span>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2 mb-6">
+            {displayAmentinies?.map((amenity, i) => (
               <span
                 key={i}
                 className="flex items-center gap-1 bg-slate-50 text-slate-500 px-2 py-1 rounded text-[10px] font-medium uppercase"
               >
-                <FeatureIcon feature={feature} />
-                {feature}
+                <FeatureIcon feature={amenity} />
+                {amenity}
               </span>
             ))}
-
-            {property.features?.length > 5 && (
-              <button
-                onClick={handleToggleFeatures}
-                className="text-[10px] text-amber-600 font-black uppercase"
-              >
-                {showAllFeatures
-                  ? 'View Less'
-                  : `+ ${property.features.length - 5} More`}
-              </button>
-            )}
           </div>
         </div>
 
         <button className="w-full border border-slate-900 py-2 rounded font-medium hover:bg-slate-900 hover:text-white transition-colors">
-          View {property.listingLabel === 'Commercial' ? 'Workspace' : 'Residence'}
+          View
         </button>
       </div>
     </div>

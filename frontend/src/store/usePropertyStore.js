@@ -77,7 +77,11 @@ export const usePropertyStore = create((set) => ({
       // append normal fields
       Object.keys(propertyData).forEach((key) => {
         if (key !== "images") {
-          formData.append(key, propertyData[key]);
+          if (Array.isArray(propertyData[key])) {
+            propertyData[key].forEach((item) => formData.append(key, item));
+          } else {
+            formData.append(key, propertyData[key]);
+          }
         }
       });
 
