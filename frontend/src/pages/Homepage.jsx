@@ -2,12 +2,12 @@ import { usePropertyStore } from "../store/usePropertyStore";
 import { useState, useEffect } from "react";
 import PropertySkeleton from "../components/PropertySkeleton";
 import PropertyCard from "../components/PropertyCard";
+import PropertDetailsModal from "../components/PropertDetailsModal";
 
 import Hero from "../components/Hero";
 const Homepage = () => {
   const { fetchProperties, properties, isLoading } = usePropertyStore();
 
-  const [viewMode, setViewMode] = useState('grid');
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [scrolled, setScrolled] = useState(false);
   const [hoveredPropertyId, setHoveredPropertyId] = useState(null);
@@ -19,7 +19,8 @@ const Homepage = () => {
   useEffect(() => {
     fetchProperties();
   }, [fetchProperties]);
-
+ 
+  console.log(properties);
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
@@ -43,21 +44,18 @@ const filteredProperties = properties.filter((property) => {
   return (
     <>
     <main className="flex-1 flex flex-col">
-     {viewMode === 'grid' && (
         <Hero
           query={filters.query}
           onSearch={(value) =>
             setFilters((prev) => ({ ...prev, query: value }))
           }
         />
-      )}
-
         {/* filter bar */}
-      <div className={`bg-white border-b border-slate-200 sticky top-0 sm:top-0 z-40 transition-all ${
-          viewMode === 'grid' ? (scrolled ? 'py-4 shadow-sm opacity-100' : 'py-0 h-0 opacity-0 overflow-hidden') : 'py-6 mt-16 sm:mt-20'
-        }`}>
+      <div className={`bg-white border-b border-slate-200 sticky top-0 sm:top-0 z-40 transition-all
+                      ${scrolled
+                      ? 'py-4 shadow-sm opacity-100'
+                      : 'py-0 h-0 opacity-0 overflow-hidden'}`}>
         <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row gap-4 px-6 sm:px-12 items-center justify-between">
-            {viewMode === 'split' && (
             <input
                 type="text"
                 value={filters.query}
@@ -65,7 +63,6 @@ const filteredProperties = properties.filter((property) => {
                 setFilters({ ...filters, query: e.target.value })
                 }
             />
-            )}
             <div className="flex flex-wrap items-center gap-3 w-full md:w-auto ml-auto">
                 <select 
                   className="bg-slate-100 px-4 py-2 rounded-full text-xs font-bold focus:outline-none border-r-8 border-transparent cursor-pointer"
@@ -79,8 +76,7 @@ const filteredProperties = properties.filter((property) => {
                 </select>
                 <div className="flex bg-slate-100 p-1 rounded-full border border-slate-200">
                   <button 
-                    onClick={() => setViewMode('grid')}
-                    className={`px-6 py-2 rounded-full text-xs font-bold transition-all ${viewMode === 'grid' ? 'bg-white shadow-md text-slate-900' : 'text-slate-400 hover:text-slate-600'}`}
+                    className={`px-6 py-2 rounded-full text-xs font-bold transition-all`}
                   >
                     Gallery
                   </button>
@@ -89,7 +85,6 @@ const filteredProperties = properties.filter((property) => {
         </div>
       </div>
         {/* Content Area */}
-            {viewMode === "grid" && (
                <div className="p-6 sm:p-12 max-w-[1600px] mx-auto w-full">
                     <div className="flex justify-between items-end mb-12">
                         <div>
@@ -109,15 +104,17 @@ const filteredProperties = properties.filter((property) => {
                                         property={property}
                                         onClick={() => {
                                             setSelectedProperty(property);
-                                            setViewMode('split');
                                         }}
                                     />
                                 ))
                             )}
                          </div>
                 </div>
-            )}
     </main>
+    {/* OVERLAY */}
+    {selectedProperty && (
+        <PropertDetailsModal property={selectedProperty} onClose={() => setSelectedProperty(null)} />
+    )}
     </>
     
   );

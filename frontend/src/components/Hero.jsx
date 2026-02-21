@@ -67,7 +67,6 @@ const Hero = ({ onSearch, query }) => {
                 </svg>
             </div>
         </div>
-        
     </>
    
   )
