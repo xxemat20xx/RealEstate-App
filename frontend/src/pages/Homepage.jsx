@@ -1,11 +1,13 @@
 import { usePropertyStore } from "../store/usePropertyStore";
 import { useState, useEffect } from "react";
-import PropertySkeleton from "../components/PropertySkeleton";
-import PropertyCard from "../components/PropertyCard";
-import PropertDetailsModal from "../components/PropertDetailsModal";
-import Navbar from "../components/Navbar";
+import PropertySkeleton from "../components/Homepage-Component/PropertySkeleton";
+import PropertyCard from "../components/Homepage-Component/PropertyCard";
+import PropertDetailsModal from "../components/Homepage-Component/PropertDetailsModal";
+import Hero from "../components/Homepage-Component/Hero";
+import CurratedCollection from "../components/Homepage-Component/CurratedCollection";
+import MarketStats from "../components/Homepage-Component/MarketStats";
+import CompanyStory from "../components/Homepage-Component/CompanyStory";
 
-import Hero from "../components/Hero";
 const Homepage = () => {
   const { fetchProperties, properties, isLoading } = usePropertyStore();
 
@@ -21,7 +23,7 @@ const Homepage = () => {
     fetchProperties();
   }, [fetchProperties]);
  
-  console.log(properties);
+
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
@@ -111,6 +113,11 @@ const filteredProperties = properties.filter((property) => {
                             )}
                          </div>
                 </div>
+          {/* Other Content */}
+        
+          <CurratedCollection />
+          <MarketStats />
+          <CompanyStory />
     </main>
     {/* OVERLAY */}
     {selectedProperty && (

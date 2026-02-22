@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { useAuthStore } from './store/useAuthStore'
+import { Routes, Route } from 'react-router-dom';
 
 //pages
 import AdminPanel from './pages/AdminPanel';
@@ -11,7 +12,10 @@ const App = () => {
   return (
     // <AdminPanel />
     <Navbar>
-    <Homepage />
+      <Routes>
+        <Route path="/" element={<Homepage />} />
+        <Route path="/admin-panel" element={<AdminPanel />} />
+      </Routes>
     </Navbar>
     
   )

@@ -1,5 +1,5 @@
 import React from 'react'
-import MapView from './MapView'
+import MapView from '../Homepage-Component/MapView'
 
 const AdminPreviewModal = ({ property, onClose }) => {
   return (

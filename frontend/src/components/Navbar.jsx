@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react"
+import AdminPanel from "../pages/AdminPanel"
+import { useNavigate } from "react-router-dom";
 
 const Navbar = ({ children }) => {
   const [scrolled, setScrolled] = useState(false);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 50) {
@@ -33,7 +35,9 @@ const Navbar = ({ children }) => {
                 <button className="hover:text-amber-500 transition-colors border-b-2 border-transparent hover:border-amber-500 pb-1">Portfolio</button>
                 <button className="hover:text-amber-500 transition-colors border-b-2 border-transparent hover:border-amber-500 pb-1">About</button>
                 <button className="hover:text-amber-500 transition-colors border-b-2 border-transparent hover:border-amber-500 pb-1">Contact</button>
-                <button className="hover:text-amber-500 transition-colors border-b-2 border-transparent hover:border-amber-500 pb-1">Admin Portal</button>
+                <button 
+                onClick={() => navigate('/admin-panel')}
+                className="hover:text-amber-500 transition-colors border-b-2 border-transparent hover:border-amber-500 pb-1">Admin Portal</button>
             </div>
             <div className="flex items-center gap-4">
             <button className={`text-sm font-bold transition-colors ${

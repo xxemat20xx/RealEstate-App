@@ -1,4 +1,4 @@
-import {X, Bed, Bath, Car, LandPlot, SquaresUnite } from 'lucide-react';
+import {X, Bed, Bath, Car, SquaresUnite } from 'lucide-react';
 
 const FeatureIcon = ({ feature }) => {
   const f = feature.toLowerCase();

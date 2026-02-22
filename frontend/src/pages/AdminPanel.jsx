@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { usePropertyStore } from '../store/usePropertyStore'
-import AdminPreviewModal from '../components/AdminPreviewModal';
-import PropertyForm from '../components/PropertyForm';
+import AdminPreviewModal from '../components/Homepage-Component/AdminPreviewModal';
+import PropertyForm from '../components/Homepage-Component/PropertyForm';
+import { useNavigate } from 'react-router-dom';
 
 const AdminPanel = () => {
  const { properties, fetchProperties, addProperty, updateProperty, deleteProperty } = usePropertyStore();
  const [isAdding, setIsAdding] = useState(false);
  const [previewProperty, setPreviewProperty] = useState(null);
  const [editingProperty, setEditingProperty] = useState(null);
+ const navigate = useNavigate();
  useEffect(() => {
   fetchProperties();
  }, [fetchProperties]);
@@ -33,9 +35,6 @@ const handleDeleteProperty = async(id) => {
   }
 
 }
-
-
-
  return (
      <div className="fixed inset-0 z-[80] bg-white flex flex-col animate-in fade-in duration-300">
       <nav className="h-20 border-b border-slate-200 px-8 flex items-center justify-between bg-white sticky top-0 z-10">
@@ -54,8 +53,10 @@ const handleDeleteProperty = async(id) => {
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
             Add New Asset
           </button>
-          <button className="text-slate-400 hover:text-slate-900 transition-colors bg-slate-100 hover:bg-slate-200 px-5 py-2.5 rounded-full">
-            <span className="text-xs font-black uppercase tracking-[0.2em]">Logout</span>
+          <button 
+          onClick={() => navigate('/')} 
+          className="text-slate-400 hover:text-slate-900 transition-colors bg-slate-100 hover:bg-slate-200 px-5 py-2.5 rounded-full">
+            <span className="text-xs font-black uppercase tracking-[0.2em]">Exit to Portal</span>
           </button>
         </div>
       </nav>

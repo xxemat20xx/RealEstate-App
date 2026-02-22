@@ -1,8 +1,8 @@
 import { useState, useRef } from "react";
 import ReCAPTCHA from "react-google-recaptcha";
-import { useInquiryStore } from "../store/useInquiryStore";
+import { useInquiryStore } from "../../store/useInquiryStore";
 
-const InquiryModal = ({ property, onClose }) => {
+const InquiryModal = ({ property, onClose}) => {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
