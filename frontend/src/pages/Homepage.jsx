@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import PropertySkeleton from "../components/PropertySkeleton";
 import PropertyCard from "../components/PropertyCard";
 import PropertDetailsModal from "../components/PropertDetailsModal";
+import Navbar from "../components/Navbar";
 
 import Hero from "../components/Hero";
 const Homepage = () => {
