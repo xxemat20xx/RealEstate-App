@@ -1,19 +1,20 @@
 import React from 'react'
+
 const collections = [
   {
-    title: 'Coastal Retreats',
-    count: 12,
-    image: 'https://picsum.photos/seed/coastal/800/600',
+    title: 'Waterfront Estates',
+    count: 18,
+    image: 'https://picsum.photos/seed/waterfront/800/600',
   },
   {
-    title: 'Urban Penthouses',
-    count: 8,
-    image: 'https://picsum.photos/seed/urban/800/600',
+    title: 'Luxury City Residences',
+    count: 24,
+    image: 'https://picsum.photos/seed/cityluxury/800/600',
   },
   {
-    title: 'Historic Manors',
-    count: 5,
-    image: 'https://picsum.photos/seed/historic/800/600',
+    title: 'Private Gated Villas',
+    count: 9,
+    image: 'https://picsum.photos/seed/villa/800/600',
   }
 ];
 
@@ -23,11 +24,15 @@ const CurratedCollection = () => {
       <div className="max-w-[1600px] mx-auto px-6 sm:px-12">
         <div className="flex justify-between items-end mb-12">
           <div>
-            <h2 className="text-sm font-black uppercase tracking-[0.3em] text-amber-600 mb-2">Lifestyles</h2>
-            <h3 className="text-3xl md:text-4xl font-serif font-bold">Curated Collections</h3>
+            <h2 className="text-sm font-black uppercase tracking-[0.3em] text-amber-600 mb-2">
+              Exclusive Properties
+            </h2>
+            <h3 className="text-3xl md:text-4xl font-serif font-bold">
+              Featured Property Collections
+            </h3>
           </div>
           <button className="text-sm font-bold uppercase tracking-widest hover:text-amber-600 transition-colors hidden md:block">
-            View All Collections
+            Explore All Listings
           </button>
         </div>
         
@@ -42,8 +47,12 @@ const CurratedCollection = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
               <div className="absolute bottom-8 left-8 right-8">
-                <p className="text-amber-500 text-xs font-bold uppercase tracking-widest mb-2">{collection.count} Properties</p>
-                <h4 className="text-white text-2xl font-serif font-bold">{collection.title}</h4>
+                <p className="text-amber-500 text-xs font-bold uppercase tracking-widest mb-2">
+                  {collection.count} Available Listings
+                </p>
+                <h4 className="text-white text-2xl font-serif font-bold">
+                  {collection.title}
+                </h4>
               </div>
             </div>
           ))}

@@ -8,6 +8,7 @@ import CurratedCollection from "../components/Homepage-Component/CurratedCollect
 import MarketStats from "../components/Homepage-Component/MarketStats";
 import CompanyStory from "../components/Homepage-Component/CompanyStory";
 
+
 const Homepage = () => {
   const { fetchProperties, properties, isLoading } = usePropertyStore();
 

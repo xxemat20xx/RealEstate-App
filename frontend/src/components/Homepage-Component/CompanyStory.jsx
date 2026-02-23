@@ -8,7 +8,7 @@ const CompanyStory = () => {
           <div className="relative h-[500px] lg:h-[600px] rounded-[2rem] overflow-hidden shadow-2xl">
             <img 
               src="https://picsum.photos/seed/company/800/1000" 
-              alt="LuxeEstate Headquarters"
+              alt="Real Estate Headquarters"
               className="w-full h-full object-cover" 
               referrerPolicy="no-referrer"
             />
@@ -22,10 +22,10 @@ const CompanyStory = () => {
           <div className="space-y-8">
             <div>
               <h2 className="text-sm font-black uppercase tracking-[0.3em] text-amber-600 mb-2">Our Heritage</h2>
-              <h3 className="text-4xl md:text-5xl font-serif font-bold leading-tight text-slate-900">The LuxeEstate Difference</h3>
+              <h3 className="text-4xl md:text-5xl font-serif font-bold leading-tight text-slate-900">The Real Estate Difference</h3>
             </div>
             <p className="text-slate-600 leading-loose text-lg">
-              Founded on the principles of discretion, integrity, and unparalleled market expertise, LuxeEstate has spent over two decades curating the world's most significant properties for an exclusive clientele.
+              Founded on the principles of discretion, integrity, and unparalleled market expertise, Real Estate has spent over two decades curating the world's most significant properties for an exclusive clientele.
             </p>
             <p className="text-slate-600 leading-loose text-lg">
               Our private advisory team operates exclusively at the highest echelons of the market, providing a white-glove service that extends far beyond the transaction. From architectural provenance to future valuation modeling, we offer a comprehensive approach to legacy wealth in real estate.

@@ -147,6 +147,7 @@ export const updateProperty = async (req, res) => {
     const {
       title,
       description,
+      address,
       price,
       bedrooms,
       bathrooms,
@@ -169,6 +170,7 @@ export const updateProperty = async (req, res) => {
     Object.assign(property, {
       title,
       description,
+      address,
       price,
       bedrooms,
       bathrooms,
