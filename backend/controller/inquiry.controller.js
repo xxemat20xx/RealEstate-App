@@ -3,7 +3,6 @@ import axios from "axios";
 import { sendEmail } from "../utils/emails.js";
 import { inquiryTemplate } from "../utils/template.js";
 import { Property } from "../models/property.model.js";
-import { render } from "@react-email/render";
 
 export const createInquiry = async (req, res) => {
   try {

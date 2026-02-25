@@ -72,7 +72,8 @@ const propertySchema = new mongoose.Schema(
       required: true,
     },
     agent: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Agent",
     },
     virtualTourUrl: {
       type: String,

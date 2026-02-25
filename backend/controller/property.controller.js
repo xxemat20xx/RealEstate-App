@@ -189,7 +189,13 @@ export const updateProperty = async (req, res) => {
 
     await property.save();
 
-    return res.status(200).json(property); // Return the updated property to the frontend
+    //populate before sending banck
+    const populatedProperty = await Property.findById(id).populate(
+      "agent",
+      "name email",
+    );
+
+    return res.status(200).json(populatedProperty); // Return the updated property to the frontend
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: error.message });
@@ -222,7 +228,7 @@ export const getProperties = async (req, res) => {
   // get all
   try {
     //fetch property
-    const property = await Property.find();
+    const property = await Property.find().populate("agent", "name email");
     res.status(200).json(property);
   } catch (error) {
     console.error(error);
@@ -233,7 +239,10 @@ export const getProperty = async (req, res) => {
   // get property by id
   try {
     //fetch property
-    const property = await Property.findById(req.params.id);
+    const property = await Property.findById(req.params.id).populate(
+      "agent",
+      "name email",
+    );
     res.status(200).json(property);
   } catch (error) {
     console.error(error);
