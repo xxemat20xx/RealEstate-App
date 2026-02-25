@@ -1,5 +1,5 @@
 import { usePropertyStore } from "../store/usePropertyStore";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo  } from "react";
 import PropertySkeleton from "../components/Homepage-Component/PropertySkeleton";
 import PropertyCard from "../components/Homepage-Component/PropertyCard";
 import PropertDetailsModal from "../components/Homepage-Component/PropertDetailsModal";
@@ -14,7 +14,6 @@ const Homepage = () => {
 
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [scrolled, setScrolled] = useState(false);
-  const [hoveredPropertyId, setHoveredPropertyId] = useState(null);
   const [filters, setFilters] = useState({
     query: '',
     listingType: ''
@@ -31,19 +30,22 @@ const Homepage = () => {
     return () => window.removeEventListener('scroll', handleScroll);
    }, []);
   
-const filteredProperties = properties.filter((property) => {
-  const location = property.address?.toLowerCase() || '';
-  const listingType = property.listingType?.toLowerCase() || '';
+const filteredProperties = useMemo(() => {
+  if (!Array.isArray(properties)) return [];
 
-  const query = filters.query?.toLowerCase() || '';
-  const filterListingType = filters.listingType?.toLowerCase() || '';
+  return properties.filter((property) => {
+    const location = property.address?.toLowerCase() || "";
+    const listingType = property.listingType?.toLowerCase() || "";
 
-  const matchesQuery = location.includes(query);
-  const matchesType =
-    !filterListingType || listingType.includes(filterListingType);
+    const query = filters.query?.toLowerCase() || "";
+    const filterListingType = filters.listingType?.toLowerCase() || "";
 
-  return matchesQuery && matchesType;
-});
+    return (
+      location.includes(query) &&
+      (!filterListingType || listingType.includes(filterListingType))
+    );
+  });
+}, [properties, filters]);
 
   return (
     <>

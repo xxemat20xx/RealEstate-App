@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { UploadCloud, X, Bed, Bath, Car, LandPlot, CalendarCheck, Trash, SquaresUnite } from 'lucide-react';
+import { useAgentStore } from '../../store/useAgentStore';
 
 const PropertyForm = ( { property, onSave, onCancel } ) => {
   const [loading, setLoading] = useState(false);
   const [deletedImageIds, setDeletedImageIds] = useState([]);
+  const { agents, getAgents } = useAgentStore();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -23,6 +25,7 @@ const PropertyForm = ( { property, onSave, onCancel } ) => {
     imageIds: [],
     mapUrl: '',
     virtualTourUrl: '',
+    agent: '',
   });
 
   const clearFormData = () => {
@@ -45,10 +48,12 @@ const PropertyForm = ( { property, onSave, onCancel } ) => {
       imageIds: [],
       mapUrl: '',
       virtualTourUrl: '',
+      agent: '',
     });
   };
 
     useEffect(() => {
+    
     if (property) {
         const imagesWithPreviews = property.images.map((image, index) => ({
         file: null,
@@ -59,12 +64,14 @@ const PropertyForm = ( { property, onSave, onCancel } ) => {
 
         setFormData({
         ...property,
+        agent: property.agent?._id || "",
         images: imagesWithPreviews,
         });
     }
-    }, [property]);
 
-
+    getAgents();
+    }, [property, getAgents]);
+    console.log(agents)
 
   const handleSubmit = async(e) => { 
     e.preventDefault();
@@ -208,7 +215,8 @@ const PropertyForm = ( { property, onSave, onCancel } ) => {
             </div>
 
             {/* FORM */}
-            <form className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-12 scrollbar-hide">
+            <form className="flex-1 overflow-y-auto p-8 lg:p-12 space-y-12 scrollbar-hide"
+            onSubmit={handleSubmit}>
                 {/* -------------------------- SECTION I: Identity -------------------------- */}
                 <section className="space-y-6">
                     <h3 className="text-xs font-black uppercase tracking-[0.3em] text-amber-600 border-b border-amber-100 pb-3">I. General Information</h3>
@@ -283,6 +291,24 @@ const PropertyForm = ( { property, onSave, onCancel } ) => {
                                     <option value="commercial">Commercial</option>
                                 </select>
                             </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Agent Selection</label>
+                                <select
+                                required
+                                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-sm outline-none cursor-pointer"
+                                value={formData.agent || ""}
+                                onChange={(e) =>
+                                    setFormData({ ...formData, agent: e.target.value })
+                                }
+                                >
+                                    <option value="">Select Agent</option>
+                                    {agents.map((agent) => (
+                                        <option key={agent._id} value={agent._id}>
+                                            {agent.name.charAt(0).toUpperCase() + agent.name.slice(1)}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -302,7 +328,6 @@ const PropertyForm = ( { property, onSave, onCancel } ) => {
                     <div className="space-y-2">
                             <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Virtual Tour URL</label>
                             <input 
-                            required 
                             type="text" 
                             className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-sm focus:ring-2 focus:ring-amber-600/10 focus:border-amber-600 transition-all outline-none" 
                             value={formData.virtualTourUrl} 
@@ -478,36 +503,36 @@ const PropertyForm = ( { property, onSave, onCancel } ) => {
                         placeholder="Draft the luxury lifestyle story for this property..." />
                         </div>
                   </section>
-            </form>
-            {/* FOOTER */}
-            <div className="p-8 border-t border-slate-100 bg-slate-50 flex justify-end gap-6 flex-shrink-0">
-            <button onClick={onCancel} className="px-8 py-4 rounded-xl font-bold text-slate-400 hover:text-slate-900 transition-colors uppercase text-xs tracking-widest">
-                Discard
-            </button>
-            <button
-            type="submit"
-            disabled={loading}
-            onClick={handleSubmit}
-            className={`relative flex items-center justify-center px-12 py-4 rounded-xl 
-                font-bold uppercase text-xs tracking-widest transition-all duration-300
-                overflow-hidden
-                ${loading 
-                ? "bg-slate-900 cursor-not-allowed" 
-                : "bg-slate-900 hover:bg-amber-600 active:scale-95"}`}
-            >
-            {loading && (
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-[shimmer_1.5s_linear_infinite]" />
-            )}
-
-            <span className="relative flex items-center gap-3 text-white">
-                {/* Update or publish */}
-                {property ? "Update Property" : "Publish Property"}
+                {/* FOOTER */}
+                <div className="p-8 border-t border-slate-100 bg-slate-50 flex justify-end gap-6 flex-shrink-0">
+                <button onClick={onCancel} className="px-8 py-4 rounded-xl font-bold text-slate-400 hover:text-slate-900 transition-colors uppercase text-xs tracking-widest">
+                    Discard
+                </button>
+                <button
+                type="submit"
+                disabled={loading}
+                className={`relative flex items-center justify-center px-12 py-4 rounded-xl 
+                    font-bold uppercase text-xs tracking-widest transition-all duration-300
+                    overflow-hidden
+                    ${loading 
+                    ? "bg-slate-900 cursor-not-allowed" 
+                    : "bg-slate-900 hover:bg-amber-600 active:scale-95"}`}
+                >
                 {loading && (
-                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-[shimmer_1.5s_linear_infinite]" />
                 )}
-            </span>
-            </button>
-            </div>
+
+                <span className="relative flex items-center gap-3 text-white">
+                    {/* Update or publish */}
+                    {property ? "Update Property" : "Publish Property"}
+                    {loading && (
+                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    )}
+                </span>
+                </button>
+                </div>
+            </form>
+
         </div>
     </div>
   )

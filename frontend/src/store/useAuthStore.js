@@ -4,6 +4,7 @@ import { api } from "../api/axios";
 export const useAuthStore = create((set) => ({
   user: null,
   isAuthenticated: false,
+  isCheckingAuth: true,
   isLoading: false,
   error: null,
 
@@ -31,16 +32,22 @@ export const useAuthStore = create((set) => ({
     }
   },
   checkAuth: async () => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, error: null, isCheckingAuth: true });
     try {
       const response = await api.get("/users/checkAuth");
       set({
         user: response.data.user,
         isAuthenticated: true,
         isLoading: false,
+        isCheckingAuth: false,
       });
     } catch (error) {
-      set({ error: error.message, isLoading: false });
+      set({
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
+        isCheckingAuth: false,
+      });
     }
   },
 }));

@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react"
-import AdminPanel from "../pages/AdminPanel"
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/useAuthStore";
+import Alert from "./Alert";
 
 const Navbar = ({ children }) => {
   const [scrolled, setScrolled] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
   const navigate = useNavigate();
+  const { isAuthenticated, logout, user} = useAuthStore();
+  
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 50) {
@@ -35,19 +39,63 @@ const Navbar = ({ children }) => {
                 <button className="hover:text-amber-500 transition-colors border-b-2 border-transparent hover:border-amber-500 pb-1">Portfolio</button>
                 <button className="hover:text-amber-500 transition-colors border-b-2 border-transparent hover:border-amber-500 pb-1">About</button>
                 <button className="hover:text-amber-500 transition-colors border-b-2 border-transparent hover:border-amber-500 pb-1">Contact</button>
+                {user?.role === 'admin' &&(
                 <button 
                 onClick={() => navigate('/admin-panel')}
-                className="hover:text-amber-500 transition-colors border-b-2 border-transparent hover:border-amber-500 pb-1">Admin Portal</button>
+                className="hover:text-amber-500 transition-colors border-b-2 border-transparent hover:border-amber-500 pb-1">Admin Portal
+                </button>
+                )}
             </div>
             <div className="flex items-center gap-4">
-            <button className={`text-sm font-bold transition-colors ${
-                scrolled ? 'text-slate-600 hover:text-slate-900' : 'text-white/90 hover:text-white'
-            }`}>Log In</button>
-            <button className="bg-amber-600 text-white px-8 py-3 rounded-full text-xs font-bold tracking-widest uppercase hover:bg-amber-700 hover:shadow-lg transition-all transform hover:-translate-y-0.5 shadow-xl">
-                Register
-            </button>
+              {isAuthenticated ? (
+                <>
+                  <span
+                    className={`text-sm ${
+                      scrolled ? "text-slate-700" : "text-white"
+                    }`}
+                  >
+                   Welcome <span className="font-bold text-amber-500">{user?.name.charAt(0).toUpperCase() + user?.name.slice(1)}</span>
+                  </span>
+
+                  <button
+                    onClick={() => {
+                      setShowAlert(true);
+                    }}
+                    className="bg-amber-600 text-white px-6 py-2 rounded-full text-xs font-bold uppercase hover:bg-amber-700 transition"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => navigate("/login")}
+                    className={`text-sm font-bold transition-colors ${
+                      scrolled
+                        ? "text-slate-600 hover:text-slate-900"
+                        : "text-white/90 hover:text-white"
+                    }`}
+                  >
+                    Log In
+                  </button>
+
+                  <button className="bg-amber-600 text-white px-8 py-3 rounded-full text-xs font-bold tracking-widest uppercase hover:bg-amber-700 transition">
+                    Register
+                  </button>
+                </>
+              )}
             </div>
         </nav>
+        {showAlert && (
+          <Alert
+            message="Are you sure you want to logout?"
+            onConfirm={() => {
+              logout();   
+              setShowAlert(false); 
+            }}
+            onCancel={() => setShowAlert(false)}
+          />
+        )}
         {children}
     </>
   )
