@@ -270,7 +270,7 @@ const PropertDetailsModal = ({ property, onClose }) => {
                                         <div className="flex items-center gap-5 mb-10">
                                             {/* <img src={property.agent.image} className="w-20 h-20 rounded-[1.5rem] object-cover shadow-lg" /> */}
                                             <div>
-                                            <h5 className="text-xl font-serif font-bold">{property.agent || 'AGENT'}</h5>
+                                            <h5 className="text-xl font-serif font-bold">{property.agent?.name.toUpperCase() || 'AGENT'}</h5>
                                             <p className="text-xs font-medium text-slate-400 uppercase tracking-widest mt-1">Global Property Partner</p>
                                             </div>
                                         </div>

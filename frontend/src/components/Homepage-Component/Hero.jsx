@@ -31,7 +31,7 @@ const Hero = ({ onSearch, query }) => {
                     <Search size={22} className="absolute left-6 w-6 h-6 text-slate-300"/>
                     <input 
                     type="text" 
-                    placeholder="Search by city, neighborhood, or lifestyle..."
+                    placeholder="Search by city or name ..."
                     className="w-full bg-white text-slate-900 rounded-xl px-16 py-5 text-lg focus:outline-none shadow-inner"
                     value={query}
                     onChange={(e) => onSearch(e.target.value)}
