@@ -9,13 +9,12 @@ const InquiryModal = ({ property, onClose}) => {
   const recaptchaRef = useRef(null);
   const { createInquiry } = useInquiryStore();
 
-  console.log(window.location.hostname)
 
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
-    phoneNumber: "",
+    contactNumber: "",
     message: `I am interested in ${property.title}. Please provide more details regarding availability and viewing schedules.`,
   });
 
@@ -40,8 +39,17 @@ const InquiryModal = ({ property, onClose}) => {
 
     const result = await createInquiry({
       ...formData,
+
+      // Property Info
       propertyId: property._id,
       propertyTitle: property.title,
+
+     
+      agentId: property.agent._id,
+      agentName: property.agent.name || 'Agent',
+      agentEmail: property.agent.email,
+      agentContactNumber: property.agent.contactNumber,
+
       recaptchaToken: token,
     });
 
@@ -65,6 +73,7 @@ const InquiryModal = ({ property, onClose}) => {
           <p className="text-slate-500 mb-8 leading-relaxed">
             Our senior advisor for {property.address} has been notified.
           </p>
+          
           <button
             onClick={onClose}
             className="w-full bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition-all"
@@ -89,36 +98,90 @@ const InquiryModal = ({ property, onClose}) => {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <input required name="firstName" value={formData.firstName} onChange={handleChange}
-              className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600/20" placeholder="John" />
+<form onSubmit={handleSubmit} className="p-8 space-y-6">
 
-            <input required name="lastName" value={formData.lastName} onChange={handleChange}
-              className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600/20" placeholder="Doe" />
-          </div>
+  {/* Agent Details */}
+  <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6">
+    <p className="text-xs uppercase tracking-widest text-slate-400 mb-3">
+      Your Assigned Senior Advisor
+    </p>
 
-          <input required type="email" name="email" value={formData.email} onChange={handleChange}
-            className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600/20"
-            placeholder="john@example.com" />
+    <div className="space-y-2">
+      <h4 className="text-lg font-serif font-semibold text-slate-900">
+        {property.agent.name || 'Agent'}
+      </h4>
 
-          <input required name="phoneNumber" value={formData.phoneNumber} onChange={handleChange}
-            className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600/20"
-            placeholder="+1 (555) 000-0000" />
+      <p className="text-sm text-slate-600">
+        {property.agent.email}
+      </p>
 
-          <textarea rows={3} name="message" value={formData.message} onChange={handleChange}
-            className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600/20 resize-none" />
+      <p className="text-sm text-slate-600">
+        {property.agent.contactNumber}
+      </p>
+    </div>
+  </div>
 
-            <ReCAPTCHA
-            sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
-            ref={recaptchaRef}
-            />
+  {/* Client Details */}
+  <div className="grid grid-cols-2 gap-4">
+    <input
+      required
+      name="firstName"
+      value={formData.firstName}
+      onChange={handleChange}
+      className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600/20"
+      placeholder="John"
+    />
 
-          <button disabled={loading} type="submit"
-            className="w-full bg-amber-600 text-white py-5 rounded-xl font-bold hover:bg-amber-700 transition-all shadow-lg flex items-center justify-center gap-3 disabled:opacity-50">
-            {loading ? "Submitting..." : "Submit Formal Inquiry"}
-          </button>
-        </form>
+    <input
+      required
+      name="lastName"
+      value={formData.lastName}
+      onChange={handleChange}
+      className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600/20"
+      placeholder="Doe"
+    />
+  </div>
+
+  <input
+    required
+    type="email"
+    name="email"
+    value={formData.email}
+    onChange={handleChange}
+    className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600/20"
+    placeholder="john@example.com"
+  />
+
+  <input
+    required
+    name="contactNumber"
+    value={formData.contactNumber}
+    onChange={handleChange}
+    className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600/20"
+    placeholder="+1 (555) 000-0000"
+  />
+
+  <textarea
+    rows={3}
+    name="message"
+    value={formData.message}
+    onChange={handleChange}
+    className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600/20 resize-none"
+  />
+
+  <ReCAPTCHA
+    sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+    ref={recaptchaRef}
+  />
+
+  <button
+    disabled={loading}
+    type="submit"
+    className="w-full bg-amber-600 text-white py-5 rounded-xl font-bold hover:bg-amber-700 transition-all shadow-lg flex items-center justify-center gap-3 disabled:opacity-50"
+  >
+    {loading ? "Submitting..." : "Submit Formal Inquiry"}
+  </button>
+</form>
       </div>
     </div>
   );

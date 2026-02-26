@@ -19,7 +19,7 @@ const inquirySchema = new mongoose.Schema(
       trim: true,
       match: [/^\S+@\S+\.\S+$/, "Please enter a valid email"],
     },
-    phoneNumber: {
+    contactNumber: {
       type: String,
       required: true,
       trim: true,

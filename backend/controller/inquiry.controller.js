@@ -11,6 +11,7 @@ export const createInquiry = async (req, res) => {
     if (!recaptchaToken) {
       return res.status(400).json({ message: "Recaptcha token is required" });
     }
+
     const verifyResponse = await axios.post(
       "https://www.google.com/recaptcha/api/siteverify",
       null,
@@ -28,18 +29,29 @@ export const createInquiry = async (req, res) => {
 
     const inquiry = await Inquiry.create(inquiryData);
 
-    //fetch property
-    const property = await Property.findById(inquiry.propertyId);
+    // 🔥 Fetch property WITH agent
+    const property = await Property.findById(inquiry.propertyId).populate(
+      "agent",
+    );
+
     if (!property) {
       return res.status(404).json({ message: "Property not found" });
     }
+
+    if (!property.agent) {
+      return res
+        .status(404)
+        .json({ message: "Agent not found for this property" });
+    }
+
+    // ✅ Send inquiry to AGENT (not client)
     await sendEmail(
-      inquiry.email,
-      "Thank you for your inquiry",
+      property.agent.email, // 🔥 changed here
+      `New Inquiry for ${property.title}`,
       inquiryTemplate({ inquiry, property }),
     );
 
-    res.status(201).json(inquiry);
+    res.status(201).json({ success: true });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal server error" });
