@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
+import { Shield, User } from "lucide-react";
+
 import Alert from "./Alert";
 
 const Navbar = ({ children }) => {
@@ -49,13 +51,31 @@ const Navbar = ({ children }) => {
             <div className="flex items-center gap-4">
               {isAuthenticated ? (
                 <>
-                  <span
-                    className={`text-sm ${
-                      scrolled ? "text-slate-700" : "text-white"
-                    }`}
-                  >
-                   Welcome <span className="font-bold text-amber-500">{user?.name.charAt(0).toUpperCase() + user?.name.slice(1)}</span>
+                <span
+                  className={`text-sm flex items-center gap-2 ${
+                    scrolled ? "text-slate-700" : "text-white"
+                  }`}
+                >
+                  {/* Admin */}
+                  {user?.role === "admin" && (
+                    <span className="flex items-center gap-1 px-2 py-0.5 bg-amber-500/10 rounded-full">
+                      <Shield className="text-amber-500" size={22} />
+                    </span>
+                  )}
+
+                  {/* Normal User */}
+                  {user?.role === "user" && (
+                    <span className="flex items-center gap-1 px-2 py-0.5 bg-amber-500 text-white rounded-full">
+                      <User size={22} />
+                    </span>
+                  )}
+
+                  Welcome{" "}
+                  <span className="font-bold text-amber-500">
+                    {user?.name?.charAt(0).toUpperCase() + user?.name?.slice(1)}
                   </span>
+
+                </span>
 
                   <button
                     onClick={() => {

@@ -9,6 +9,9 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Login from './pages/Login';
 
+// toaster
+import { ToastContainer, Bounce } from 'react-toastify';
+
 
 
 const ProtectedRoutes = ({ children }) => {
@@ -32,6 +35,20 @@ const App = () => {
   return (
     // <AdminPanel />
     <>
+      <ToastContainer
+        position="top-right"
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Bounce}
+      />
+
        <Navbar>
       <Routes>
         <Route path="/" element={<Homepage />} />
