@@ -89,7 +89,7 @@ const filteredProperties = useMemo(() => {
         </div>
       </div>
         {/* Content Area */}
-               <div className="p-6 sm:p-12 max-w-[1600px] mx-auto w-full">
+               <div className="p-6 sm:p-12 max-w-[1600px] mx-auto w-full" id="property">
                     <div className="flex justify-between items-end mb-12">
                         <div>
                             <h2 className="text-sm font-black uppercase tracking-[0.3em] text-amber-600 mb-2">Portfolio Selection</h2>

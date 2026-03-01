@@ -27,9 +27,19 @@ const userSchema = new mongoose.Schema({
     type: [String],
     default: null,
   },
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
+  otp: String,
+  passwordResetOtp: String,
+  passwordResetOtpExpiry: Date,
+
+  passwordResetToken: String,
+  passwordResetTokenExpiry: Date,
 });
 
-// ✅ Correct pre-save hook
+// pre-save hook
 userSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
 

@@ -1,37 +1,47 @@
-import { useState } from "react"
+import { useState, useEffect } from "react";
 
-const AddAgentForm = ({ agent, onSave, onCancel }) => {
+const AddAgentForm = ({ onSave, onCancel, agent }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    contactNumber: '',
-    address: '',
-  })
+    name: "",
+    email: "",
+    contactNumber: "",
+    address: "",
+  });
+
+  // Populate form when editing an agent
+  useEffect(() => {
+    if (agent) {
+      setFormData({
+        name: agent.name || "",
+        email: agent.email || "",
+        contactNumber: agent.contactNumber || "",
+        address: agent.address || "",
+      });
+    }
+  }, [agent]);
 
   const clearFormData = () => {
     setFormData({
-      name: '',
-      email: '',
-      contactNumber: '',
-      address: '',
-    })
-  }
+      name: "",
+      email: "",
+      contactNumber: "",
+      address: "",
+    });
+  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    try {
-      await onSave(formData)
-      clearFormData()
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(formData); // Pass form data to onSave function
+    clearFormData(); // Clear form after submission
+  };
 
   return (
     <div className="fixed inset-0 z-[110] bg-slate-900/75 backdrop-blur-lg flex items-center justify-center p-6 sm:p-12">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-lg p-8">
-        <h2 className="text-2xl font-semibold text-slate-900 mb-6 text-center">Add New Agent</h2>
-        
+        <h2 className="text-2xl font-semibold text-slate-900 mb-6 text-center">
+          {agent ? "Edit Agent" : "Add New Agent"}
+        </h2>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Name Field */}
           <div>
@@ -39,18 +49,22 @@ const AddAgentForm = ({ agent, onSave, onCancel }) => {
               type="text"
               placeholder="Full Name"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
               className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
             />
           </div>
-          
+
           {/* Email Field */}
           <div>
             <input
               type="email"
               placeholder="Email Address"
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
               className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
             />
           </div>
@@ -61,7 +75,9 @@ const AddAgentForm = ({ agent, onSave, onCancel }) => {
               type="text"
               placeholder="Contact Number"
               value={formData.contactNumber}
-              onChange={(e) => setFormData({ ...formData, contactNumber: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, contactNumber: e.target.value })
+              }
               className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
             />
           </div>
@@ -72,7 +88,9 @@ const AddAgentForm = ({ agent, onSave, onCancel }) => {
               type="text"
               placeholder="Address"
               value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, address: e.target.value })
+              }
               className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all"
             />
           </div>
@@ -83,7 +101,7 @@ const AddAgentForm = ({ agent, onSave, onCancel }) => {
               type="submit"
               className="w-full py-3 bg-amber-600 text-white font-semibold rounded-lg shadow-md hover:bg-amber-500 transition-all focus:ring-2 focus:ring-amber-500 focus:outline-none"
             >
-              Save Agent
+              {agent ? "Save Changes" : "Save Agent"}
             </button>
 
             <button
@@ -97,7 +115,7 @@ const AddAgentForm = ({ agent, onSave, onCancel }) => {
         </form>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AddAgentForm
+export default AddAgentForm;

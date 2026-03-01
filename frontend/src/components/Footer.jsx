@@ -2,7 +2,7 @@ import React from 'react'
 
 const Footer = () => {
   return (
-          <footer className="bg-slate-900 text-slate-400 py-24 px-6 sm:px-12 border-t border-slate-800">
+          <footer className="bg-slate-900 text-slate-400 py-24 px-6 sm:px-12 border-t border-slate-800" id="contact">
          <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
             <div className="space-y-6">
                <div className="flex items-center gap-3 text-white">

@@ -2,7 +2,7 @@ import React from 'react'
 
 const CompanyStory = () => {
   return (
-    <div className="py-24 bg-slate-50">
+    <div className="py-24 bg-slate-50" id="about">
       <div className="max-w-[1600px] mx-auto px-6 sm:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div className="relative h-[500px] lg:h-[600px] rounded-[2rem] overflow-hidden shadow-2xl">

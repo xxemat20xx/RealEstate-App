@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import { Shield, User, Menu, X, LogOut } from "lucide-react";
 import Alert from "./Alert";
@@ -10,7 +10,6 @@ const Navbar = ({ children }) => {
   const [showAlert, setShowAlert] = useState(false);
 
   const navigate = useNavigate();
-  const location = useLocation();
   const { isAuthenticated, logout, user } = useAuthStore();
 
   useEffect(() => {
@@ -20,10 +19,17 @@ const Navbar = ({ children }) => {
   }, []);
 
   const navItems = [
-    { name: "Portfolio", path: "/" },
-    { name: "About", path: "/" },
-    { name: "Contact", path: "/" },
+    { name: "Property", targetId: "property" },
+    { name: "About", targetId: "about" },
+    { name: "Contact", targetId: "contact" },
   ];
+
+  const handleNavClick = (id) => {
+    const section = document.getElementById(id);
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
     <>
@@ -48,7 +54,6 @@ const Navbar = ({ children }) => {
           >
             R
           </div>
-
           <span className="hidden sm:block font-serif text-2xl font-semibold tracking-tight group-hover:text-amber-500 transition">
             RealEstate
           </span>
@@ -59,15 +64,14 @@ const Navbar = ({ children }) => {
           {navItems.map((item) => (
             <button
               key={item.name}
-              onClick={() => navigate(item.path)}
+              onClick={() => handleNavClick(item.targetId)} // Scroll to section on click
               className={`relative transition duration-300 ${
                 scrolled ? "text-slate-600" : "text-white/80"
               } hover:text-amber-500`}
             >
               {item.name}
               <span
-                className={`absolute left-0 -bottom-1 h-[2px] bg-amber-500 transition-all duration-300
-                }`}
+                className={`absolute left-0 -bottom-1 h-[2px] bg-amber-500 transition-all duration-300`}
               />
             </button>
           ))}
@@ -80,7 +84,6 @@ const Navbar = ({ children }) => {
               } hover:text-amber-500`}
             >
               Admin Portal
-              
             </button>
           )}
         </div>
@@ -179,7 +182,7 @@ const Navbar = ({ children }) => {
             <button
               key={item.name}
               onClick={() => {
-                navigate(item.path);
+                handleNavClick(item.targetId); // Scroll to section
                 setMobileOpen(false);
               }}
               className="hover:text-amber-500 transition transform hover:translate-x-2"
