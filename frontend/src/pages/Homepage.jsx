@@ -1,8 +1,8 @@
 import { usePropertyStore } from "../store/usePropertyStore";
 import { useState, useEffect, useMemo  } from "react";
-import PropertySkeleton from "../components/Homepage-Component/PropertySkeleton";
+import PropertySkeleton from "../components/Admin-Components/PropertySkeleton";
 import PropertyCard from "../components/Homepage-Component/PropertyCard";
-import PropertDetailsModal from "../components/Homepage-Component/PropertDetailsModal";
+import PropertDetailsModal from "../components/Admin-Components/PropertDetailsModal";
 import Hero from "../components/Homepage-Component/Hero";
 import CurratedCollection from "../components/Homepage-Component/CurratedCollection";
 import MarketStats from "../components/Homepage-Component/MarketStats";
@@ -61,7 +61,7 @@ const filteredProperties = useMemo(() => {
           }
         />
         {/* filter bar */}
-      <div className={`bg-white border-b border-slate-200 sticky top-0 sm:top-0 z-40 transition-all
+      <div className={`bg-white border-b border-slate-200 sm:top-0 z-40 transition-all
                       ${scrolled
                       ? 'py-4 shadow-sm opacity-100'
                       : 'py-0 h-0 opacity-0 overflow-hidden'}`}>

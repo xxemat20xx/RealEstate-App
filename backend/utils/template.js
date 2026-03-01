@@ -130,7 +130,7 @@ export const inquiryTemplate = ({ inquiry, property }) => {
                 color: "#374151",
               },
             },
-            `📞 Phone: ${inquiry.phoneNumber}`,
+            `📞 Phone: ${inquiry.contactNumber || inquiry.phoneNumber}`,
           ),
           React.createElement(
             Text,

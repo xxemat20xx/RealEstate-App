@@ -20,8 +20,10 @@ export const useAgentStore = create((set) => ({
       set({ isLoading: true });
       const response = await api.post("/agents/create-agent", agent);
       set({ agents: [...agents, response.data], isLoading: false });
+      toast.success("Created succesful");
     } catch (error) {
       set({ error, isLoading: false });
+      toast.error(error.message);
     }
   },
 
@@ -35,8 +37,10 @@ export const useAgentStore = create((set) => ({
         ),
         isLoading: false,
       });
+      toast.success("Updated succesful");
     } catch (error) {
       set({ error, isLoading: false });
+      toast.error(error.message);
     }
   },
 
@@ -48,8 +52,10 @@ export const useAgentStore = create((set) => ({
         agents: agents.filter((agent) => agent.id !== id),
         isLoading: false,
       });
+      toast.success("Deleted succesful");
     } catch (error) {
       set({ error, isLoading: false });
+      toast.error(error.message);
     }
   },
 }));

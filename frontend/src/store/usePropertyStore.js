@@ -1,14 +1,16 @@
 import { create } from "zustand";
 import { api } from "../api/axios";
+import { toast } from "react-toastify";
 
 export const usePropertyStore = create((set) => ({
   properties: [],
   isLoading: false,
   error: null,
+  message: null,
 
   setProperties: (properties) => set({ properties }),
   fetchProperties: async () => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, error: null, message: null });
     try {
       const response = await api.get("/properties/get");
       set({ properties: response.data, isLoading: false });
@@ -17,7 +19,7 @@ export const usePropertyStore = create((set) => ({
     }
   },
   addProperty: async (propertyData) => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, error: null, message: null });
 
     try {
       const formData = new FormData();
@@ -50,26 +52,37 @@ export const usePropertyStore = create((set) => ({
         properties: [...state.properties, response.data],
         isLoading: false,
       }));
+      toast.success("Added succesful");
     } catch (error) {
-      set({ error: error.message, isLoading: false });
-      throw error; // re-throw so your AdminPanel onSave can catch it
+      const message = error?.response?.data?.message;
+      error?.message || "Error on adding property";
+
+      set({
+        error: message,
+        isLoading: false,
+      });
+      toast.error(message);
+
+      throw error;
     }
   },
 
   deleteProperty: async (id) => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, error: null, message: null });
     try {
       await api.delete(`/properties/delete/${id}`);
       set((state) => ({
         properties: state.properties.filter((property) => property._id !== id),
         isLoading: false,
       }));
+      toast.success("Deleted succesful");
     } catch (error) {
       set({ error: error.message, isLoading: false });
+      toast.error(error.message);
     }
   },
   updateProperty: async (id, propertyData, deletedImageIds) => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, error: null, message: null });
 
     try {
       const formData = new FormData();
@@ -105,8 +118,10 @@ export const usePropertyStore = create((set) => ({
         ),
         isLoading: false,
       }));
+      toast.success("Updated succesful");
     } catch (error) {
       set({ error: error.message, isLoading: false });
+      toast.error(error.message);
     }
   },
 }));

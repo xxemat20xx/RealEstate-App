@@ -17,12 +17,6 @@ import { ToastContainer, Bounce } from 'react-toastify';
 const ProtectedRoutes = ({ children }) => {
   const { isAuthenticated, user, checkAuth, isLoading } = useAuthStore();
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      checkAuth();
-    }
-  }, [checkAuth, isAuthenticated]);
-
   if (isLoading) return <div>Loading...</div>;
 
   if (!isAuthenticated || user?.role !== "admin") return <Navigate to="/" />;
@@ -32,12 +26,18 @@ const ProtectedRoutes = ({ children }) => {
 
 
 const App = () => {
+  const { checkAuth } = useAuthStore();
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth])
+  
   return (
     // <AdminPanel />
     <>
       <ToastContainer
-        position="top-right"
-        autoClose={2000}
+        position="bottom-right"
+        autoClose={1000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick={false}
