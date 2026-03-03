@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const inquirySchema = new mongoose.Schema(
   {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      require: false, //Guest allowed
+    },
     firstName: {
       type: String,
       required: true,
@@ -30,7 +35,8 @@ const inquirySchema = new mongoose.Schema(
       trim: true,
     },
     propertyId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Property",
       required: true,
     },
     propertyTitle: {

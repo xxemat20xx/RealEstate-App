@@ -25,43 +25,48 @@ const InquiryModal = ({ property, onClose}) => {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const token = recaptchaRef.current.getValue();
+  const token = recaptchaRef.current.getValue();
+  if (!token) {
+    alert("Please complete the reCAPTCHA");
+    return;
+  }
 
-    if (!token) {
-      alert("Please complete the reCAPTCHA");
-      return;
-    }
+  setLoading(true);
 
-    setLoading(true);
-
-    const result = await createInquiry({
-      ...formData,
-
-      // Property Info
+  try {
+    const payload = {
+      ...formData, 
       propertyId: property._id,
-      propertyTitle: property.title,
-
-     
-      agentId: property.agent._id,
-      agentName: property.agent.name || 'Agent',
-      agentEmail: property.agent.email,
-      agentContactNumber: property.agent.contactNumber,
-
       recaptchaToken: token,
-    });
+    };
+
+    const result = await createInquiry(payload);
 
     setLoading(false);
     recaptchaRef.current.reset();
 
     if (result?.success) {
       setSubmitted(true);
+      setFormData({
+        firstName: "",
+        lastName: "",
+        email: "",
+        contactNumber: "",
+        message: "",
+      });
     } else {
       alert(result?.message || "Something went wrong");
     }
-  };
+  } catch (err) {
+    console.error(err);
+    setLoading(false);
+    recaptchaRef.current.reset();
+    alert("Something went wrong while submitting your inquiry.");
+  }
+};
 
   if (submitted) {
     return (
@@ -108,15 +113,15 @@ const InquiryModal = ({ property, onClose}) => {
 
     <div className="space-y-2">
       <h4 className="text-lg font-serif font-semibold text-slate-900">
-        {property.agent.name || 'Agent'}
+        {property?.agent?.name || 'Agent'}
       </h4>
 
       <p className="text-sm text-slate-600">
-        {property.agent.email}
+        {property?.agent?.email || 'Email'}
       </p>
 
       <p className="text-sm text-slate-600">
-        {property.agent.contactNumber}
+        {property?.agent?.contactNumber || 'Contact Number'}
       </p>
     </div>
   </div>

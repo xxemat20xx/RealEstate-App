@@ -71,7 +71,7 @@ const PropertyForm = ( { property, onSave, onCancel } ) => {
 
     getAgents();
     }, [property, getAgents]);
-    console.log(agents)
+
 
   const handleSubmit = async(e) => { 
     e.preventDefault();

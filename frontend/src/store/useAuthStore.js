@@ -21,17 +21,18 @@ export const useAuthStore = create((set) => ({
         isLoading: false,
       });
       toast.success("Login successful");
-
       return true;
     } catch (error) {
-      const message = error?.response?.data?.message;
-      error?.message || "Login failed";
+      const message =
+        error?.response?.data?.message || error?.message || "Login failed";
 
       set({
         error: message,
         isLoading: false,
       });
+
       toast.error(message);
+      return false;
     }
   },
   logout: async () => {
@@ -91,13 +92,12 @@ export const useAuthStore = create((set) => ({
         password,
       });
       set({
-        user: response.data.user,
-        isAuthenticated: true,
         isLoading: false,
       });
       toast.success(
         "Registration successful, OTP was sent to your registered email",
       );
+      return response.data;
     } catch (error) {
       toast.error(error.response?.data?.message || "Error signing up.");
       set({ isLoading: false });
@@ -117,6 +117,33 @@ export const useAuthStore = create((set) => ({
       return false;
     } finally {
       set({ isLoading: false });
+    }
+  },
+  forgotPassword: async ({ email }) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await api.post("/users/forgot", { email });
+      set({ user: response.data.user, isLoading: false });
+      toast.success("Link was sent to your email address.");
+    } catch (error) {
+      set({ isLoading: false });
+      toast.error("User not found.");
+      throw error;
+    }
+  },
+  resetPassword: async (token, newPassword) => {
+    set({ isLoading: true, error: null });
+    try {
+      const res = await api.put(`/users/reset/${token}`, { newPassword });
+      toast.success("Password updated.");
+      set({ isLoading: false, message: res.data.message });
+    } catch (error) {
+      set({
+        isLoading: false,
+        error: error.response?.data?.message || "Something went wrong",
+      });
+      toast.error("Something went wrong.");
+      throw new Error(error);
     }
   },
 }));

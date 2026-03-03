@@ -8,6 +8,8 @@ import Homepage from './pages/Homepage';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Login from './pages/Login';
+import ResetPassword from './pages/ResetPassword'
+import Inquiries from './pages/Inquiries'
 
 // toaster
 import { ToastContainer, Bounce } from 'react-toastify';
@@ -28,7 +30,6 @@ const RedirectAuthenticatedUser = ({ children }) => {
   const { isAuthenticated, user, isCheckingAuth } = useAuthStore();
 
   if (isCheckingAuth) return <div>Loading...</div>;
-
   if (isAuthenticated && user?.isVerified) return <Navigate to="/" replace />;
 
   return children;
@@ -67,15 +68,25 @@ const App = () => {
             <AdminPanel />
           </ProtectedRoutes>
         } />
+        <Route path="/inquiries" element={
+          <RedirectAuthenticatedUser>
+            <Inquiries />
+          </RedirectAuthenticatedUser>
+        } />
         <Route
           path="/login"
           element={
-              <Login/>
+           
+               <Login/>
         }
         />
+        <Route path="/reset/:token" element={<ResetPassword />} />
       </Routes>
+
     </Navbar>
+    
     <Footer />
+    
     </>
  
   )

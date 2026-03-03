@@ -41,4 +41,23 @@ export const useInquiryStore = create((set) => ({
       toast.error(error.message);
     }
   },
+  getMyInquiries: async () => {
+    try {
+      const response = await api.get("/inquiries/get_my_inquiries");
+      set({ inquiries: response.data });
+    } catch (error) {
+      console.error("Error fetching my inquiries:", error);
+      toast.error(error.message);
+    }
+  },
+  deleteAllInquiries: async () => {
+    try {
+      await api.delete("/inquiries/delete_all_inquiries");
+      set({ inquiries: [] });
+      toast.success("All inquiries deleted successfully");
+    } catch (error) {
+      console.error("Error deleting inquiries:", error);
+      toast.error(error.message);
+    }
+  },
 }));

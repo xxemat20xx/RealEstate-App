@@ -16,16 +16,19 @@ const Login = () => {
   const [showOtp, setShowOtp] = useState(false);
   const [step, setStep] = useState("login"); // login | register | forgot | otp
 
-  const { login, register, isLoading, verifyOTP } = useAuthStore();
+  const { login, register, isLoading, verifyOTP, forgotPassword } = useAuthStore();
 
+  
   // =========================
   // LOGIN
   // =========================
   const handleLogin = async (e) => {
     e.preventDefault();
-    await login(email, password); 
-    navigate(-1)
- 
+    const success = await login(email, password); 
+    if(success){
+      navigate("/")
+    }
+    return;
   };
 
   // =========================
@@ -34,8 +37,12 @@ const Login = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) return;
+
     await register({ name, email, password });
     setStep("otp");
+    setPassword("");
+    setConfirmPassword("");
+    setName("");
 
   };
 
@@ -44,9 +51,11 @@ const Login = () => {
   // =========================
   const handleVerifyOTP = async (e) => {
     e.preventDefault();
-    const success = await verifyOTP({ email, otp });
-    if(success){
+    const success = await verifyOTP({ email, otp }); // uses the correct email
+    if (success) {
       setStep("login");
+    } else {
+      setOtp('');
     }
   };
 
@@ -55,7 +64,7 @@ const Login = () => {
   // =========================
   const handleForgotPassword = async (e) => {
     e.preventDefault();
-    console.log("Forgot password clicked", email);
+    await forgotPassword({ email });
   };
 
   const handleSubmit = (e) => {
@@ -85,7 +94,7 @@ const Login = () => {
 
         {/* Close Button */}
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/")}
           className="absolute top-5 right-5 text-slate-400 hover:text-amber-600"
         >
           <X className="w-6 h-6" />
@@ -181,7 +190,7 @@ const Login = () => {
 
           {/* OTP FORM */}
           {step === "otp" && (
-            <div className="space-y-2 relative"> {/* <-- add relative here */}
+            <div className="space-y-2 relative"> 
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">
                 Enter OTP
               </label>
@@ -240,6 +249,46 @@ const Login = () => {
                   className="absolute right-4 top-[38px] text-slate-400"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+
+              {/* Forgot Password Link */}
+              <div className="text-right mt-1">
+                <button
+                  type="button"
+                  onClick={() => setStep("forgot")}
+                  className="text-amber-600 text-xs font-semibold hover:underline"
+                >
+                  Forgot Password?
+                </button>
+              </div>
+            </>
+          )}
+          {/* FORGOT PASSWORD FORM */}
+          {step === "forgot" && (
+            <>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  Enter Your Email
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-sm"
+                  placeholder="you@email.com"
+                />
+              </div>
+
+              {/* Back to Login */}
+              <div className="text-right mt-1">
+                <button
+                  type="button"
+                  onClick={() => setStep("login")}
+                  className="text-slate-500 text-xs font-semibold hover:underline"
+                >
+                  Back to Login
                 </button>
               </div>
             </>

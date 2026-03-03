@@ -14,16 +14,14 @@ import {
     Check,
     Mail,
 } from "lucide-react";
-import MapView from "../Homepage-Component/MapView"
-import InquiryModal from "../Homepage-Component/InquiryForm"
+import MapView from "./MapView"
+import InquiryModal from "./InquiryForm"
 
 
 const PropertDetailsModal = ({ property, onClose }) => {
  const [activeImage, setActiveImage] = useState(0);
  const [showInquiry, setShowInquiry] = useState(false);
  const pricePerSqft = Math.round(property.price / property.sqft);
-
-console.log(property);
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-0 sm:p-6 bg-slate-900/80 backdrop-blur-md">
         {/* Inquiry Form Modal Overlay */}

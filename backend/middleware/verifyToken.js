@@ -43,3 +43,27 @@ export const adminOnly = async (req, res, next) => {
     });
   }
 };
+
+// ✅ Optional user middleware
+export const optionalVerifyToken = async (req, res, next) => {
+  const token = req.cookies.accessToken;
+
+  if (!token) {
+    // No token? Proceed as guest
+    return next();
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId).select("_id name email");
+    if (user) {
+      req.userId = user._id; // attach userId to request
+      req.user = user; // optionally attach full user
+    }
+    next();
+  } catch (error) {
+    console.log("Error verifying optional token:", error);
+    // Still allow request to continue as guest
+    next();
+  }
+};

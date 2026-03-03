@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import PropertySkeleton from "../components/Admin-Components/PropertySkeleton";
 import PropertyCard from "../components/Homepage-Component/PropertyCard";
-import PropertDetailsModal from "../components/Admin-Components/PropertDetailsModal";
+import PropertDetailsModal from "../components/Homepage-Component/PropertDetailsModal";
 import Hero from "../components/Homepage-Component/Hero";
 import CurratedCollection from "../components/Homepage-Component/CurratedCollection";
 import MarketStats from "../components/Homepage-Component/MarketStats";
@@ -93,7 +93,7 @@ const Homepage = () => {
         </AnimatePresence>
 
         {/* Listings */}
-        <div className="p-6 sm:p-12 max-w-[1600px] mx-auto w-full">
+        <div className="p-6 sm:p-12 max-w-[1600px] mx-auto w-full" id="property">
 
           <motion.div
             initial={{ opacity: 0, y: 30 }}
