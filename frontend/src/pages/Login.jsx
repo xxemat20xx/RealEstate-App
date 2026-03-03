@@ -7,64 +7,75 @@ const Login = () => {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [otp, setOtp] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState("login"); // login | register | forgot
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showOtp, setShowOtp] = useState(false);
+  const [step, setStep] = useState("login"); // login | register | forgot | otp
 
-  const { login } = useAuthStore();
+  const { login, register, isLoading, verifyOTP } = useAuthStore();
 
   // =========================
   // LOGIN
   // =========================
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
-    const success = await login(email, password);
-
-    if (success) {
-      navigate("/");
-    }
-
-    setLoading(false);
+    await login(email, password); 
+    navigate(-1)
+ 
   };
 
   // =========================
-  // REGISTER (EMPTY HANDLER)
+  // REGISTER
   // =========================
   const handleRegister = async (e) => {
     e.preventDefault();
-    console.log("Register clicked");
+    if (password !== confirmPassword) return;
+    await register({ name, email, password });
+    setStep("otp");
+
   };
 
   // =========================
-  // FORGOT PASSWORD (EMPTY HANDLER)
+  // VERIFY OTP
+  // =========================
+  const handleVerifyOTP = async (e) => {
+    e.preventDefault();
+    const success = await verifyOTP({ email, otp });
+    if(success){
+      setStep("login");
+    }
+  };
+
+  // =========================
+  // FORGOT PASSWORD
   // =========================
   const handleForgotPassword = async (e) => {
     e.preventDefault();
-    console.log("Forgot password clicked");
+    console.log("Forgot password clicked", email);
   };
 
-  // =========================
-  // Dynamic Submit Handler
-  // =========================
   const handleSubmit = (e) => {
     if (step === "login") return handleLogin(e);
     if (step === "register") return handleRegister(e);
+    if (step === "otp") return handleVerifyOTP(e);
     if (step === "forgot") return handleForgotPassword(e);
   };
 
   const getTitle = () => {
     if (step === "login") return "Welcome Back";
     if (step === "register") return "Create Account";
+    if (step === "otp") return "Verify OTP";
     if (step === "forgot") return "Reset Password";
   };
 
   const getButtonText = () => {
     if (step === "login") return "Sign In";
     if (step === "register") return "Create Account";
+    if (step === "otp") return "Verify OTP";
     if (step === "forgot") return "Send Reset Link";
   };
 
@@ -82,9 +93,7 @@ const Login = () => {
 
         {/* Header */}
         <div className="px-10 pt-12 pb-6 text-center">
-          <h2 className="text-3xl font-serif font-bold text-slate-900">
-            {getTitle()}
-          </h2>
+          <h2 className="text-3xl font-serif font-bold text-slate-900">{getTitle()}</h2>
           <p className="text-xs uppercase tracking-[0.3em] text-amber-600 mt-2 font-bold">
             Luxury Property Console
           </p>
@@ -93,84 +102,153 @@ const Login = () => {
         {/* Form */}
         <form onSubmit={handleSubmit} className="px-10 pb-10 space-y-6">
 
-          {/* Email */}
-          <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">
-              Email Address
-            </label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-sm"
-              placeholder="you@email.com"
-            />
-          </div>
+          {/* REGISTER FORM */}
+          {step === "register" && (
+            <>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-sm"
+                  placeholder="John Doe"
+                />
+              </div>
 
-          {/* Password (Hidden in Forgot) */}
-          {step !== "forgot" && (
-            <div className="space-y-2 relative">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-sm"
+                  placeholder="you@email.com"
+                />
+              </div>
+
+              <div className="space-y-2 relative">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  Password
+                </label>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  autoComplete=""
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-sm pr-12"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-[38px] text-slate-400"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+
+              <div className="space-y-2 relative">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  Confirm Password
+                </label>
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  autoComplete=""
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-sm pr-12"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-4 top-[38px] text-slate-400"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </>
+          )}
+
+          {/* OTP FORM */}
+          {step === "otp" && (
+            <div className="space-y-2 relative"> {/* <-- add relative here */}
               <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">
-                Password
+                Enter OTP
               </label>
               <input
-                type={showPassword ? "text" : "password"}
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                type={showOtp ? "text" : "password"}
+                autoComplete=""
+                value={otp}
+                maxLength={6}
+                onChange={(e) => setOtp(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-sm pr-12"
-                placeholder="••••••••"
+                placeholder="123456"
               />
-
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={() => setShowOtp(!showOtp)}
                 className="absolute right-4 top-[38px] text-slate-400"
               >
-                {showPassword ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
-                  <Eye className="w-5 h-5" />
-                )}
+                {showOtp ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
           )}
 
-          {/* Confirm Password (Register Only) */}
-          {step === "register" && (
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">
-                Confirm Password
-              </label>
-              <input
-                type="password"
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-sm"
-                placeholder="••••••••"
-              />
-            </div>
-          )}
-
-          {/* Forgot Password Link (Login Only) */}
+          {/* LOGIN FORM */}
           {step === "login" && (
-            <div className="flex justify-between items-center text-xs">
-              <button
-                type="button"
-                onClick={() => setStep("forgot")}
-                className="text-amber-600 font-semibold"
-              >
-                Forgot Password?
-              </button>
-            </div>
+            <>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-sm"
+                  placeholder="you@email.com"
+                />
+              </div>
+
+              <div className="space-y-2 relative">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  Password
+                </label>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  autoComplete=""
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-5 py-4 text-sm pr-12"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-[38px] text-slate-400"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </>
           )}
 
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={loading}
+            disabled={isLoading}
             className="w-full py-4 rounded-xl font-bold uppercase tracking-widest text-xs
             bg-gradient-to-r from-amber-500 to-amber-600 text-white"
           >
@@ -179,7 +257,6 @@ const Login = () => {
 
           {/* Bottom Switch Buttons */}
           <div className="text-center text-xs pt-4 space-y-2">
-
             {step === "login" && (
               <button
                 type="button"
@@ -189,8 +266,7 @@ const Login = () => {
                 Create Account
               </button>
             )}
-
-            {step !== "login" && (
+            {step === "register" && (
               <button
                 type="button"
                 onClick={() => setStep("login")}

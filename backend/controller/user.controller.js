@@ -1,7 +1,14 @@
 import { User } from "../models/user.model.js";
-import { cookieOptions } from "../utils/cookie.js";
-import { generateAccessToken, generateRefreshToken } from "../utils/token.js";
 
+import { sendEmail } from "../utils/emails.js";
+
+import { cookieOptions } from "../utils/cookie.js";
+import { hashToken } from "../utils/hashToken.js";
+import { generateAccessToken, generateRefreshToken } from "../utils/token.js";
+import { otpEmailTemplate } from "../utils/template.js";
+
+export const generateOTP = () =>
+  Math.floor(100000 + Math.random() * 900000).toString();
 export const register = async (req, res) => {
   const { email, password, name, role } = req.body;
   try {
@@ -9,17 +16,34 @@ export const register = async (req, res) => {
     if (existingUser)
       return res.status(400).json({ message: "User already exists" });
 
+    const otp = generateOTP();
+    const otpExpiry = Date.now() + 10 * 60 * 1000; //10mins
+
+    const hashedOtp = hashToken(otp);
+
     const newUser = new User({
-      email,
-      password,
       name,
+      email,
       role: role || "user",
+      password,
+      otp: hashedOtp,
+      otpExpiry,
     });
     await newUser.save();
 
-    return res.status(201).json({ message: "User created successfully" });
+    // sending email verification
+    await sendEmail(
+      email,
+      "Verify your email",
+      otpEmailTemplate({ name, otp }),
+    );
+
+    res
+      .status(201)
+      .json({ message: "User registered. OTP was sent to email." });
   } catch (error) {
     res.status(500).json({ error: error.message });
+    console.error(error);
   }
 };
 export const login = async (req, res) => {
@@ -32,6 +56,9 @@ export const login = async (req, res) => {
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid password" });
+    }
+    if (!user.isVerified) {
+      return res.status(401).json({ message: "User is not verified" });
     }
 
     const accessToken = generateAccessToken(user);
@@ -89,6 +116,30 @@ export const getAllUsers = async (req, res) => {
     res.json(users);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+export const verifyOTP = async (req, res) => {
+  const { email, otp } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (Date.now() > user.otpExpiry) {
+      return res.status(400).json({ message: "OTP expired" });
+    }
+
+    const hashedOtp = hashToken(otp);
+
+    if (hashedOtp !== user.otp) {
+      return res.status(400).json({ message: "Invalid OTP" });
+    }
+
+    user.isVerified = true;
+    user.otp = null;
+    user.otpExpiry = null;
+    await user.save();
+
+    res.status(200).json({ message: "Email verified successfully ✅" });
+  } catch (error) {
+    console.error(error);
   }
 };
 export const checkAuth = async (req, res) => {

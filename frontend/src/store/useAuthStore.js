@@ -82,4 +82,41 @@ export const useAuthStore = create((set) => ({
       });
     }
   },
+  register: async ({ name, email, password }) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await api.post("/users/register", {
+        name,
+        email,
+        password,
+      });
+      set({
+        user: response.data.user,
+        isAuthenticated: true,
+        isLoading: false,
+      });
+      toast.success(
+        "Registration successful, OTP was sent to your registered email",
+      );
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Error signing up.");
+      set({ isLoading: false });
+      throw error;
+    }
+  },
+  verifyOTP: async ({ email, otp }) => {
+    set({ isLoading: true, error: null });
+    try {
+      const res = await api.post("users/verify", { email, otp });
+      toast.success(res.data.message || "Email verified successfully ✅");
+      return true;
+    } catch (error) {
+      const message = error.response?.data?.message || "Invalid or expired OTP";
+      set({ error: message });
+      toast.error(message);
+      return false;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
 }));

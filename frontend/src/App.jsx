@@ -15,7 +15,7 @@ import { ToastContainer, Bounce } from 'react-toastify';
 
 
 const ProtectedRoutes = ({ children }) => {
-  const { isAuthenticated, user, checkAuth, isLoading } = useAuthStore();
+  const { isAuthenticated, user, isLoading } = useAuthStore();
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -23,6 +23,16 @@ const ProtectedRoutes = ({ children }) => {
 
   return children;
 };
+
+const RedirectAuthenticatedUser = ({ children }) => {
+  const { isAuthenticated, user, isCheckingAuth } = useAuthStore();
+
+  if (isCheckingAuth) return <div>Loading...</div>;
+
+  if (isAuthenticated && user?.isVerified) return <Navigate to="/" replace />;
+
+  return children;
+}
 
 
 const App = () => {
@@ -37,7 +47,7 @@ const App = () => {
     <>
       <ToastContainer
         position="bottom-right"
-        autoClose={1000}
+        autoClose={1500}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick={false}
@@ -59,7 +69,9 @@ const App = () => {
         } />
         <Route
           path="/login"
-          element={<Login/>}
+          element={
+              <Login/>
+        }
         />
       </Routes>
     </Navbar>
