@@ -1,44 +1,47 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-  },
-  password: {
-    type: String,
-    required: true,
-    minlength: 6,
-  },
-  role: {
-    type: String,
-    enum: ["user", "admin"],
-    default: "user",
-  },
-  avatar: {
-    type: String,
-    default: null,
-  },
-  refreshToken: {
-    type: [String],
-    default: null,
-  },
-  isVerified: {
-    type: Boolean,
-    default: false,
-  },
-  otp: String,
-  passwordResetOtp: String,
-  passwordResetOtpExpiry: Date,
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+    },
+    password: {
+      type: String,
+      required: true,
+      minlength: 6,
+    },
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
+    avatar: {
+      type: String,
+      default: null,
+    },
+    refreshToken: {
+      type: [String],
+      default: null,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    otp: String,
+    passwordResetOtp: String,
+    passwordResetOtpExpiry: Date,
 
-  passwordResetToken: String,
-  passwordResetTokenExpiry: Date,
-});
+    passwordResetToken: String,
+    passwordResetTokenExpiry: Date,
+  },
+  { timestamps: true },
+);
 
 // pre-save hook
 userSchema.pre("save", async function () {

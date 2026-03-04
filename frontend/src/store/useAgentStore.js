@@ -21,7 +21,7 @@ export const useAgentStore = create((set, get) => ({
     try {
       set({ isLoading: true });
       const response = await api.post("/agents/create-agent", agent);
-      const currentAgents = get().agents; // Get the current agents from state
+      const currentAgents = get().agents;
       set({ agents: [...currentAgents, response.data], isLoading: false });
       toast.success("Created successfully");
     } catch (error) {

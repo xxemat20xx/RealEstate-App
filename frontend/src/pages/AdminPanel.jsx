@@ -11,7 +11,10 @@ import {
   ChevronsLeft,
   ChevronsRight,
   LogOut,
-  House
+  House,
+  UserCheck,
+  Check,
+  X,
 } from 'lucide-react';
 
 // alert
@@ -19,39 +22,54 @@ import Alert from "../../src/components/Alert"
 
 //form
 import PropertyForm from '../components/Admin-Components/PropertyForm';
-import AddAgentForm from '../components/Admin-Components/AddAgentForm';
+import AgentForm from '../components/Admin-Components/AgentForm';
+import EditUserForm from '../components/Admin-Components/EditUserForm';
+
+import { useUserStore } from '../store/useUserStore';
 import { useAgentStore } from '../store/useAgentStore';
 
 const AdminPanel = () => {
   const { properties, fetchProperties, addProperty, updateProperty, deleteProperty } = usePropertyStore();
   const { getAgents, agents, createAgent, updateAgent, deleteAgent} = useAgentStore();
-  
+  const { fetchAllUser, users, deleteUser, updateRole} = useUserStore();
+
+  //agent
   const [isAdding, setIsAdding] = useState(false);
   const [isAddingAgent, setIsAddingAgent] = useState(false);
+  const [editingAgent, setEditingAgent] = useState(null);
+
+  //property
   const [previewProperty, setPreviewProperty] = useState(null);
   const [editingProperty, setEditingProperty] = useState(null);
-  const [editingAgent, setEditingAgent] = useState(null);
+
+  //users
+  const [editingUser, setEditingUser] = useState(null);
+
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [view, setView] = useState('overview');
+  const [view, setView] = useState('property');
   const [showAlert, setShowAlert] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchProperties();
     getAgents();
-  }, [fetchProperties, getAgents]);
+    fetchAllUser();
+  }, []);
 
+  
+  // PROPERTY HANDLER
   const handleUpdateProperty = (property) => {
     setEditingProperty(property);
     setIsAdding(true);
   };
-
   const handleDeleteProperty = async (id) => {
         await deleteProperty(id);
         fetchProperties();
   };
 
+  // AGENT HANDLER
   const handleAddAgent = async (agentData) => {
     try {
       if (editingAgent) {
@@ -68,18 +86,28 @@ const AdminPanel = () => {
       console.error("Error saving agent:", error);
     }
   };
-
   const handleAgentUpdate = (agent) => {
     setEditingAgent(agent); 
     setIsAddingAgent(true);    
   };
 
+  // USERS HANDLER
+  const handleUpdateUser = async ({ role }) => {
+    if (!editingUser) return;
+    await updateRole(editingUser._id, role);
+    setEditingUser(null); // close modal
+  };
+
+  const handleDeleteUser = async(id) => {
+    await deleteUser(id)
+  };
 
   const navItems = [
-    { icon: <House size={18} />, label: 'Manage Property', onClick: () => setView('overview') },
-    { icon: <Users size={18} />, label: 'Manage Agents', onClick: () => setView('agents') }
+    { icon: <House size={18} />, label: 'Manage Property', onClick: () => setView('property') },
+    { icon: <Users size={18} />, label: 'Manage Agents', onClick: () => setView('agents') },
+    { icon: <UserCheck size={18} />, label: 'Manage Users', onClick: () => setView('users') }
   ];
-
+  
   return (
     <div className="fixed inset-0 z-[80] flex bg-white">
       {/* Sidebar */}
@@ -136,7 +164,7 @@ const AdminPanel = () => {
         className={`flex-1 overflow-y-auto bg-slate-50 p-8 sm:p-12 lg:p-16 transition-all duration-300
           ${sidebarOpen ? 'ml-64' : 'ml-16'}`}
       >
-        {view === 'overview' ? (
+        {view === 'property' && (
           <>
             <div className="max-w-[1400px] mx-auto">
               <div className="flex justify-between items-end mb-10">
@@ -257,7 +285,9 @@ const AdminPanel = () => {
               </div>
             </div>
           </>
-        ) : (
+        )}
+        {/* AGENT VIEW */}
+        {view === 'agents' && (
           <>
             <div className="max-w-[1400px] mx-auto">
               <div className="flex justify-between items-end mb-10">
@@ -363,6 +393,94 @@ const AdminPanel = () => {
             </div>
           </>
         )}
+
+        {/*USERS VIEW  */}
+        {view === 'users' && (
+        <div className="max-w-[1400px] mx-auto">
+          <div className="flex justify-between items-end mb-6">
+            <div>
+              <h2 className="text-3xl font-serif font-bold text-slate-900">User Management</h2>
+              <p className="text-slate-500 mt-2">
+                Manage {users.length} registered users.
+              </p>
+            </div>
+            {/* Search */}
+            <input
+              type="text"
+              placeholder="Search by name or email..."
+              className="px-4 py-2 border rounded-lg text-sm shadow-sm"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+    <div className="bg-white rounded-[2rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+      <table className="w-full text-left table-auto">
+        <thead className="bg-slate-900 text-white">
+          <tr>
+            
+            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Created At</th>
+            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Name</th>
+            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Email</th>
+            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Role</th>
+            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Verified</th>
+            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.3em] opacity-60 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-50">
+          {users
+            .filter((u) =>
+              u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              u.email.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+            .map((user) => (
+              <tr key={user._id} className="hover:bg-slate-50/80 transition-all group">
+
+               <td className="px-6 py-4 font-bold text-slate-900">
+                {user.createdAt 
+                  ? new Date(user.createdAt).toLocaleDateString('en-GB') // "DD/MM/YYYY"
+                  : '00/00/0000'}
+              </td>
+                <td className="px-6 py-4 font-bold text-slate-900">{user?.name || 'Name'}</td>
+                <td className="px-6 py-4 text-slate-600">{user?.email || 'Email@gmail.com'}</td>
+                <td className="px-6 py-4 text-slate-600">{user?.role || "user" }</td>
+                <td className="px-6 py-4 text-slate-600">
+                  {user.isVerified ? <Check size={22} className='text-green-600' strokeWidth='6px' /> : <X size={22} className='text-red-700' strokeWidth='6px'/> }
+                </td>
+                <td className="px-6 py-4 text-right flex justify-end gap-2">
+                  {/* Placeholder for edit role */}
+                  <button
+                    onClick={() => setEditingUser(user)}
+                    className="bg-white border border-slate-200 p-2 rounded-xl text-slate-500 hover:text-amber-600 hover:border-amber-200 transition-all shadow-sm"
+                  >
+                    <Pen size={16} />
+                  </button>
+
+                  {/* Placeholder for delete */}
+                  <button
+                    onClick={() => setShowAlert(true)}
+                    className="bg-white border border-slate-200 p-2 rounded-xl text-slate-500 hover:text-red-600 hover:border-red-200 transition-all shadow-sm"
+                  >
+                    <Trash size={16} />
+                  </button>
+                      {showAlert && (
+                          <Alert
+                          message={`Are you sure you want to delete ${user.email}?`}
+                          onConfirm={() => {
+                                    handleDeleteUser(user._id)
+                                    setShowAlert(false);
+                                  }}
+                                  onCancel={() => setShowAlert(false)}
+                                />
+                              )}
+                </td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
       </div>
 
       {/* Property Form */}
@@ -392,7 +510,7 @@ const AdminPanel = () => {
 
       {/* Adding agent modal */}
       {isAddingAgent && (
-        <AddAgentForm
+        <AgentForm
           onSave={handleAddAgent}  // Pass the actual handler
           onCancel={() => {
             setIsAddingAgent(false);  // Clear modal state
@@ -405,6 +523,16 @@ const AdminPanel = () => {
       {/* Preview Modal */}
       {previewProperty && (
         <AdminPreviewModal property={previewProperty} onClose={() => setPreviewProperty(null)} />
+      )}
+
+      {/* -Edit User Modal */}
+            {/* Edit User Modal */}
+      {editingUser && (
+        <EditUserForm
+          user={editingUser}
+          onSave={handleUpdateUser} // calls Zustand updateRole
+          onCancel={() => setEditingUser(null)} // close modal
+        />
       )}
     </div>
   );

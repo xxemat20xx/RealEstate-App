@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import { useInquiryStore } from "../store/useInquiryStore";
 import { Shield, User, Mail } from "lucide-react";
 
 import Alert from "../components/Alert";
 
-
-
 const Inquiries = () => {
+  const navigate = useNavigate();
+
   const { user, isAuthenticated } = useAuthStore();
   const [showConfirm, setShowConfirm] = useState(false);
+
   const {
     inquiries,
     getInquiries,
@@ -53,23 +55,38 @@ const Inquiries = () => {
   };
 
   return (
-    <div className="relative min-h-[90vh] w-full flex flex-col items-center py-24 px-4 sm:px-12 
-    bg-gradient-to-br from-slate-50 via-white to-slate-100 
-    dark:from-slate-900 dark:via-slate-950 dark:to-slate-900">
+    <div
+      className="relative min-h-[90vh] w-full flex flex-col items-center py-24 px-4 sm:px-12 
+      bg-gradient-to-br from-slate-50 via-white to-slate-100 
+      dark:from-slate-900 dark:via-slate-950 dark:to-slate-900"
+      id="inquiries-section"
+    >
+    {/* Header Section */}
+    <div className="w-full max-w-7xl mb-14">
 
-      {/* Header Section */}
-      <div className="w-full max-w-7xl flex flex-col sm:flex-row items-center justify-between mb-14 gap-6">
+      <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
 
-        <div className="text-center sm:text-left">
-          <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
-            Inquiries
-          </h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-3 text-sm sm:text-base">
-            Manage and review all property inquiries
-          </p>
+        {/* Left: Back + Title */}
+        <div className="flex items-center gap-4">
+          <div>
+            <h1 className="text-4xl sm:text-5xl font-bold 
+            bg-gradient-to-r from-amber-500 to-orange-500 
+            bg-clip-text text-transparent">
+              Inquiries
+            </h1>
+
+            <p className="text-slate-500 dark:text-slate-400 
+            mt-2 text-sm sm:text-base">
+              Manage and review all property inquiries
+            </p>
+          </div>
+
+
+
+
         </div>
 
-        {/* Delete All Button - Admin Only */}
+        {/* Right: Delete Button */}
         {user?.role === "admin" && inquiries.length > 0 && (
           <button
             onClick={() => setShowConfirm(true)}
@@ -89,7 +106,19 @@ const Inquiries = () => {
             )}
           </button>
         )}
+
       </div>
+        <button
+            onClick={() => navigate("/")}
+            className="px-4 py-2 rounded-lg 
+            text-slate-300
+            hover:text-amber-400 
+            transition-all duration-200
+            cursor-pointer"
+          >
+            ← Back
+          </button>
+    </div>
 
       {/* Loading State */}
       {loading ? (
@@ -180,8 +209,10 @@ const Inquiries = () => {
               </div>
             </div>
           ))}
+          
         </div>
       )}
+
       {showConfirm && (
         <Alert
           title="Delete All Inquiries"

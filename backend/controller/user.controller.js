@@ -17,6 +17,11 @@ export const generateOTP = () =>
 export const register = async (req, res) => {
   const { email, password, name, role } = req.body;
   try {
+    if (password.length <= 6)
+      return res
+        .status(401)
+        .json({ message: "Password must be at least 6 character" });
+
     const existingUser = await User.findOne({ email });
     if (existingUser)
       return res.status(400).json({ message: "User already exists" });
@@ -119,9 +124,9 @@ export const logout = async (req, res) => {
 export const getAllUsers = async (req, res) => {
   try {
     const users = await User.find();
-    res.json(users);
+    res.status(200).json({ users });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 export const verifyOTP = async (req, res) => {
@@ -212,6 +217,53 @@ export const resetPassword = async (req, res) => {
       message: error.message,
       error: error.message,
     });
+  }
+};
+export const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deletedUser = await User.findByIdAndDelete(id);
+
+    if (!deletedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "User record deleted successfully.",
+      user: deletedUser,
+    });
+  } catch (error) {
+    console.error("Delete User Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+export const updateRole = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { role } = req.body;
+
+    if (!role) {
+      return res.status(400).json({ message: "Role is required" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { role },
+      { new: true },
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "User role updated successfully.",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Update Role Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 export const checkAuth = async (req, res) => {

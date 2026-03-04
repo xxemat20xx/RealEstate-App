@@ -52,7 +52,7 @@ const Navbar = ({ children }) => {
 
           {/* Minimal View Inquiries */}
           <button
-            onClick={() => navigate("/inquiries")}
+            onClick={() => navigate("/inquiries#inquiries-section")}
             title="View Inquiries"
             className={`p-2 rounded-md text-white bg-amber-500 hover:bg-amber-600 transition duration-200 ${
               isMobile ? "w-full flex justify-start gap-2" : "flex items-center"
