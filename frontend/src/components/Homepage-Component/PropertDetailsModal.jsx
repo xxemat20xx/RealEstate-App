@@ -101,78 +101,115 @@ const PropertDetailsModal = ({ property, onClose }) => {
                             ))}
                          </div>
                          {/* Quick Stats Grid */}
-                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 py-10 border-y border-slate-100">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 py-10 border-y border-slate-100">
+
                             {property.listingType !== 'commercial' ? (
                                 <>
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400">
-                                        <Bed size={22}/>
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 shrink-0">
+                                    <Bed size={22} />
                                     </div>
-                                    <div>
-                                        <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Bedrooms</p>
-                                        <p className="text-xl font-bold">{property.bedrooms}</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400">
-                                        <BathIcon size={22}/>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Bathrooms</p>
-                                        <p className="text-xl font-bold">{property.bathrooms}</p>
+                                    <div className="min-w-0">
+                                    <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                                        Bedrooms
+                                    </p>
+                                    <p className="text-xl font-bold truncate">
+                                        {property.bedrooms}
+                                    </p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400">
-                                        <Car size={22}/>
+
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 shrink-0">
+                                    <BathIcon size={22} />
                                     </div>
-                                    <div>
-                                        <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Garages</p>
-                                        <p className="text-xl font-bold">{property.parking}</p>
+                                    <div className="min-w-0">
+                                    <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                                        Bathrooms
+                                    </p>
+                                    <p className="text-xl font-bold truncate">
+                                        {property.bathrooms}
+                                    </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 shrink-0">
+                                    <Car size={22} />
+                                    </div>
+                                    <div className="min-w-0">
+                                    <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                                        Garages
+                                    </p>
+                                    <p className="text-xl font-bold truncate">
+                                        {property.parking}
+                                    </p>
                                     </div>
                                 </div>
                                 </>
-                                ) : (
+                            ) : (
                                 <>
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400">
-                                            <Building size={22}/>
-                                        </div>
-                                        <div>
-                                            <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Offices</p>
-                                            <p className="text-xl font-bold">Premium</p>
-                                        </div>
-                                        <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400">
-                                            <Users size={22}/>
-                                        </div>
-                                        <div>
-                                            <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Capacity</p>
-                                            <p className="text-xl font-bold">50+</p>
-                                        </div>
-                                        </div>
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 shrink-0">
+                                    <Building size={22} />
                                     </div>
+                                    <div className="min-w-0">
+                                    <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                                        Offices
+                                    </p>
+                                    <p className="text-xl font-bold truncate">
+                                        Premium
+                                    </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-3 min-w-0">
+                                    <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 shrink-0">
+                                    <Users size={22} />
+                                    </div>
+                                    <div className="min-w-0">
+                                    <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                                        Capacity
+                                    </p>
+                                    <p className="text-xl font-bold truncate">
+                                        50+
+                                    </p>
+                                    </div>
+                                </div>
                                 </>
                             )}
-                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400">
-                                    <Expand size={22}/>
+
+                            <div className="flex items-center gap-3 min-w-0">
+                                <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 shrink-0">
+                                <Expand size={22} />
                                 </div>
-                                <div>
-                                    <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Total Area</p>
-                                    <p className="text-xl font-bold">{property.sqft.toLocaleString()} <span className="text-xs font-normal">Sqft</span></p>
+                                <div className="min-w-0">
+                                <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                                    Total Area
+                                </p>
+                                <p className="text-xl font-bold truncate">
+                                    {property.sqft.toLocaleString()}{" "}
+                                    <span className="text-xs font-normal">Sqft</span>
+                                </p>
                                 </div>
-                             </div>
-                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400">
-                                   <ChartNoAxesColumnIncreasing size={22}/>
+                            </div>
+
+                            <div className="flex items-center gap-3 min-w-0">
+                                <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 shrink-0">
+                                <ChartNoAxesColumnIncreasing size={22} />
                                 </div>
-                                <div>
-                                    <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Valuation</p>
-                                    <p className="text-xl font-bold">${pricePerSqft.toLocaleString()}<span className="text-xs font-normal opacity-50 ml-0.5">/ft</span></p>
+                                <div className="min-w-0">
+                                <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                                    Valuation
+                                </p>
+                                <p className="text-xl font-bold truncate">
+                                    ${pricePerSqft.toLocaleString()}
+                                    <span className="text-xs font-normal opacity-50 ml-0.5">/ft</span>
+                                </p>
                                 </div>
-                             </div>
-                         </div>
+                            </div>
+
+                            </div>
                          {/* Virtual Tour */}
                         {property.virtualTourUrl && (
                         <div className="space-y-6">
