@@ -17,7 +17,7 @@ export const generateOTP = () =>
 export const register = async (req, res) => {
   const { email, password, name, role } = req.body;
   try {
-    if (password.length <= 6)
+    if (password.length < 6)
       return res
         .status(401)
         .json({ message: "Password must be at least 6 character" });
