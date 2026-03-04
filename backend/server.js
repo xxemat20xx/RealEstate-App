@@ -16,24 +16,27 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  "https://www.ematsproject.store",
+];
+
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin) return callback(null, true); // allow Postman / server-side requests
+      if (!origin) return callback(null, true);
 
-      // Allow localhost
       if (origin.includes("localhost")) return callback(null, true);
 
-      // Allow any Vercel deployment (preview + production)
       if (origin.endsWith(".vercel.app")) return callback(null, true);
 
-      // Block all others
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
   }),
 );
-
 //increase body size limit
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
