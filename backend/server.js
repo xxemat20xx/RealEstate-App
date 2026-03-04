@@ -16,16 +16,19 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const allowedOrigins = ["http://localhost:5173", process.env.CLIENT_URL];
-
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
+      if (!origin) return callback(null, true); // allow Postman / server-side requests
+
+      // Allow localhost
+      if (origin.includes("localhost")) return callback(null, true);
+
+      // Allow any Vercel deployment (preview + production)
+      if (origin.endsWith(".vercel.app")) return callback(null, true);
+
+      // Block all others
+      return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
   }),
