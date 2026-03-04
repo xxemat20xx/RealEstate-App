@@ -81,8 +81,7 @@ The system implements role-based access control (RBAC) using JWT to secure admin
 
 - Frontend: Vercel
 - Backend: Render
-- Domain: https://www.ematsproject.store/
-
+  
 ---
 
 ## 👨‍💻 Author
