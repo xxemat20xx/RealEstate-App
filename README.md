@@ -9,7 +9,7 @@ The application demonstrates strong full-stack fundamentals, secure authenticati
 ---
 
 ## 📸 Screenshot
-![Emats Project Screenshot](./screenshot/screenshot1.png)
+![Emats Project Screenshot](./frontend/screenshot/screenshot1.png)
 
 ## 🚀 Tech Stack
 
