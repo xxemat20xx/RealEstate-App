@@ -8,8 +8,8 @@ import Homepage from './pages/Homepage';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Login from './pages/Login';
-import ResetPassword from './pages/ResetPassword'
-import Inquiries from './pages/Inquiries'
+import ResetPassword from './pages/ResetPassword';
+import Inquiries from './pages/Inquiries';
 
 // toaster
 import { ToastContainer, Bounce } from 'react-toastify';
@@ -17,9 +17,9 @@ import { ToastContainer, Bounce } from 'react-toastify';
 
 
 const ProtectedRoutes = ({ children }) => {
-  const { isAuthenticated, user, isLoading } = useAuthStore();
+  const { isAuthenticated, user, isCheckingAuth } = useAuthStore();
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isCheckingAuth) return <div>Loading...</div>;
 
   if (!isAuthenticated || user?.role !== "admin") return <Navigate to="/" />;
 
@@ -44,52 +44,52 @@ const App = () => {
   }, [checkAuth])
   
   return (
-    // <AdminPanel />
-    <>
-      <ToastContainer
-        position="bottom-right"
-        autoClose={1500}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick={false}
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        transition={Bounce}
-      />
+  <>
+    <ToastContainer
+      position="bottom-right"
+      autoClose={1500}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+      theme="light"
+      transition={Bounce}
+    />
 
-       <Navbar>
-      <Routes>
-        <Route path="/" element={<Homepage />} />
-        <Route path="/admin-panel" element={
+    <Navbar />
+
+    <Routes>
+      <Route path="/" element={<Homepage />} />
+
+      <Route
+        path="/admin-panel"
+        element={
           <ProtectedRoutes>
             <AdminPanel />
           </ProtectedRoutes>
-        } />
-        <Route path="/inquiries" element={
+        }
+      />
+
+      <Route
+        path="/inquiries"
+        element={
           <RedirectAuthenticatedUser>
             <Inquiries />
           </RedirectAuthenticatedUser>
-        } />
-        <Route
-          path="/login"
-          element={
-           
-               <Login/>
         }
-        />
-        <Route path="/reset/:token" element={<ResetPassword />} />
-      </Routes>
+      />
 
-    </Navbar>
-    
+      <Route path="/login" element={<Login />} />
+
+      <Route path="/reset/:token" element={<ResetPassword />} />
+    </Routes>
+
     <Footer />
-    
-    </>
- 
-  )
+  </>
+);
 }
 
 export default App
