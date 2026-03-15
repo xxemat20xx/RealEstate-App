@@ -1,8 +1,8 @@
-# 🌐 Emats Project
+# 🌐 Real Estate Project
 
 🔗 **Live Site:** https://www.ematsproject.store/
 
-Emats Project is a full-stack MERN web application built with modern technologies, featuring secure authentication, email integration, cloud-based image handling, map-based property viewing, virtual property tours via YouTube, and a complete Admin CMS system.
+Real Estate Project App is a full-stack MERN web application built with modern technologies, featuring secure authentication, email integration, cloud-based image handling, map-based property viewing, virtual property tours via YouTube, and a complete Admin CMS system.
 
 The application demonstrates strong full-stack fundamentals, secure authentication workflows, and scalable backend architecture.
 
