@@ -10,7 +10,6 @@ import {
     Users, 
     Expand,
     ChartNoAxesColumnIncreasing,
-    Play,
     Check,
     Mail,
 } from "lucide-react";
@@ -23,13 +22,13 @@ const PropertDetailsModal = ({ property, onClose }) => {
  const [showInquiry, setShowInquiry] = useState(false);
  const pricePerSqft = Math.round(property.price / property.sqft);
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-0 sm:p-6 bg-slate-900/80 backdrop-blur-md">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-0 sm:p-6 bg-slate-900/80 backdrop-blur-md overflow-y-auto">
         {/* Inquiry Form Modal Overlay */}
          {showInquiry && (
             <InquiryModal property={property} onClose={() => setShowInquiry(false)} />
          )}
          {/* Hero Section */}
-          <div className="bg-white w-full max-w-7xl h-full sm:h-auto sm:max-h-[95vh] sm:rounded-3xl overflow-hidden shadow-2xl flex flex-col">
+          <div className="bg-white w-full max-w-7xl h-full sm:h-auto sm:max-h-[95vh] sm:rounded-3xl shadow-2xl flex flex-col">
             <div className="relative h-[40vh] sm:h-[500px] flex-shrink-0">
                 <img 
                     src={property.images[activeImage]} 
@@ -83,7 +82,7 @@ const PropertDetailsModal = ({ property, onClose }) => {
                 </div>
             </div>
             {/* Main Content Body */}
-            <div className="flex-1 overflow-y-auto bg-white">
+            <div className="flex-1 bg-white">
                 <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-0 lg:divide-x divide-slate-100">
                      {/* Left Content Column */}
                      <div className="flex-1 p-8 sm:p-12 space-y-16">
@@ -217,9 +216,6 @@ const PropertDetailsModal = ({ property, onClose }) => {
                             <div className="relative h-96 group rounded-[2rem] overflow-hidden bg-slate-900 shadow-xl">
                                    <img src={property.images[1] || property.images[0]} className="w-full h-full object-cover opacity-40 group-hover:scale-105 transition-all duration-1000" />
                                    <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center p-8">
-                                        <div className="w-20 h-20 bg-amber-600 rounded-full flex items-center justify-center mb-6 shadow-2xl animate-pulse">
-                                            <Play size={22}/>
-                                        </div>
                                         <h4 className="text-2xl font-bold mb-2">3D Virtual Walkthrough</h4>
                                         <p className="text-slate-300 text-sm max-w-sm mb-8">Take a private digital tour of every room and corner from the comfort of your screen.</p>
                                         <a 
