@@ -48,6 +48,10 @@ app.use("/api/users", userRoutes);
 app.use("/api/inquiries", inquiryRoutes);
 app.use("/api/agents", agentRoutes);
 
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   connectDB();
