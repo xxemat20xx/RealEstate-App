@@ -22,11 +22,8 @@ const PropertDetailsModal = ({ property, onClose }) => {
  const [showInquiry, setShowInquiry] = useState(false);
  const pricePerSqft = Math.round(property.price / property.sqft);
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-0 sm:p-6 bg-slate-900/80 backdrop-blur-md overflow-y-auto">
-        {/* Inquiry Form Modal Overlay */}
-         {showInquiry && (
-            <InquiryModal property={property} onClose={() => setShowInquiry(false)} />
-         )}
+    <>
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-0 sm:p-6 bg-slate-900/80 backdrop-blur-md overflow-y-auto">
          {/* Hero Section */}
           <div className="bg-white w-full max-w-7xl h-full sm:h-auto sm:max-h-[95vh] sm:rounded-3xl shadow-2xl flex flex-col">
             <div className="relative h-[40vh] sm:h-[500px] flex-shrink-0">
@@ -323,6 +320,12 @@ const PropertDetailsModal = ({ property, onClose }) => {
             </div>
           </div>
     </div>
+            {/* Inquiry Form Modal Overlay */}
+         {showInquiry && (
+            <InquiryModal property={property} onClose={() => setShowInquiry(false)} />
+         )}
+    </>
+
   )
 }
 

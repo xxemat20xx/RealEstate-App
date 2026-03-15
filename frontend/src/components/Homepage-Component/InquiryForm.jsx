@@ -91,8 +91,8 @@ const InquiryModal = ({ property, onClose}) => {
   }
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-3xl overflow-hidden shadow-2xl w-full max-w-xl animate-in fade-in slide-in-from-bottom-8 duration-500">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6 bg-slate-900/80 backdrop-blur-md">
+      <div className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden">
         <div className="bg-slate-900 p-8 text-white relative">
           <button onClick={onClose} className="absolute top-6 right-6 text-white/50 hover:text-white">
             ✕
