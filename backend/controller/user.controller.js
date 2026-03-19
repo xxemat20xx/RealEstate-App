@@ -14,8 +14,9 @@ import crypto from "crypto";
 
 export const generateOTP = () =>
   Math.floor(100000 + Math.random() * 900000).toString();
+
 export const register = async (req, res) => {
-  const { email, password, name, role } = req.body;
+  const { email, password, name, role } = req.validatedData;
   try {
     if (password.length < 6)
       return res
@@ -58,7 +59,7 @@ export const register = async (req, res) => {
 };
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.validatedData;
     const user = await User.findOne({ email }).select("+password");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -130,11 +131,19 @@ export const getAllUsers = async (req, res) => {
   }
 };
 export const verifyOTP = async (req, res) => {
-  const { email, otp } = req.body;
+  const { email, otp } = req.validatedData;
   try {
+    const MAX_ATTEMPTS = 5;
+
     const user = await User.findOne({ email });
     if (Date.now() > user.otpExpiry) {
       return res.status(400).json({ message: "OTP expired" });
+    }
+    // Check if max attempts reached
+    if (user.otpAttempts >= MAX_ATTEMPTS) {
+      return res.status(429).json({
+        message: "Too many failed attempts. Please request a new OTP.",
+      });
     }
 
     const hashedOtp = hashToken(otp);
@@ -146,6 +155,7 @@ export const verifyOTP = async (req, res) => {
     user.isVerified = true;
     user.otp = null;
     user.otpExpiry = null;
+    user.otpAttempts = 0;
     await user.save();
 
     res.status(200).json({ message: "Email verified successfully ✅" });
@@ -154,11 +164,38 @@ export const verifyOTP = async (req, res) => {
   }
 };
 export const forgotPassword = async (req, res) => {
-  const { email } = req.body;
+  const email = req.validatedData?.email.toLowerCase().trim();
+  const responseMessage = {
+    msg: "If this email exists, a password reset link has been sent",
+  };
+
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "User not found" });
+    if (!user) return res.json(responseMessage);
 
+    const now = Date.now();
+    const oneHourAgo = now - 60 * 60 * 1000;
+
+    // Reset count if last attempt was > 1 hour ago
+    if (
+      !user.passwordResetAttempts ||
+      user.passwordResetAttempts.lastAttempt < oneHourAgo
+    ) {
+      user.passwordResetAttempts = { count: 0, lastAttempt: null };
+    }
+
+    if (user.passwordResetAttempts.count >= 5) {
+      return res
+        .status(429)
+        .json({ message: "Too many password reset requests, try again later" });
+    }
+
+    // Increment attempt
+    user.passwordResetAttempts.count += 1;
+    user.passwordResetAttempts.lastAttempt = new Date();
+    await user.save({ validateBeforeSave: false });
+
+    // Generate reset token
     const resetToken = crypto.randomBytes(32).toString("hex");
     const hashedToken = crypto
       .createHash("sha256")
@@ -166,24 +203,20 @@ export const forgotPassword = async (req, res) => {
       .digest("hex");
 
     user.passwordResetToken = hashedToken;
-    user.passwordResetTokenExpiry = Date.now() + 15 * 60 * 1000; // 15min
-
+    user.passwordResetTokenExpiry = now + 15 * 60 * 1000;
     await user.save({ validateBeforeSave: false });
 
     const resetUrl = `${process.env.CLIENT_URL}/reset/${resetToken}`;
-
     await sendEmail(
       email,
       "Reset Password",
-      resetPasswordEmailTemplate({
-        name: user?.name,
-        resetUrl,
-      }),
+      resetPasswordEmailTemplate({ name: user.name, resetUrl }),
     );
-    res.json({ msg: "Password reset link sent" });
+
+    return res.json(responseMessage);
   } catch (error) {
     console.error(error);
-    res
+    return res
       .status(500)
       .json({ message: "Internal server error", error: error.message });
   }
@@ -200,11 +233,15 @@ export const resetPassword = async (req, res) => {
       passwordResetToken: hashedToken,
       passwordResetTokenExpiry: { $gt: Date.now() },
     });
+
     if (!user) {
       return res.status(400).json({ message: "Invalid or expired token" });
     }
 
-    user.password = req.body.newPassword;
+    // ✅ Use validatedData instead of req.body
+    const { newPassword } = req.validatedData;
+    user.password = newPassword;
+
     user.passwordResetToken = undefined;
     user.passwordResetTokenExpiry = undefined;
 
@@ -241,7 +278,7 @@ export const deleteUser = async (req, res) => {
 export const updateRole = async (req, res) => {
   try {
     const { id } = req.params;
-    const { role } = req.body;
+    const { role } = req.validatedData;
 
     if (!role) {
       return res.status(400).json({ message: "Role is required" });

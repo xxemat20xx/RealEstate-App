@@ -2,6 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import helmet from "helmet";
+import mongoSanitize from "express-mongo-sanitize";
 
 import { connectDB } from "./lib/db.js";
 
@@ -16,6 +18,13 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// ✅ 1. SECURITY HEADERS
+app.use(helmet());
+
+// ✅ 2. PREVENT MONGO INJECTION
+app.use(mongoSanitize());
+
+// ✅ 3. CORS (keep your config)
 const allowedOrigins = [
   process.env.CLIENT_URL,
   "https://www.ematsproject.store",
@@ -27,9 +36,7 @@ app.use(
       if (!origin) return callback(null, true);
 
       if (origin.includes("localhost")) return callback(null, true);
-
       if (origin.endsWith(".vercel.app")) return callback(null, true);
-
       if (allowedOrigins.includes(origin)) return callback(null, true);
 
       return callback(new Error("Not allowed by CORS"));
@@ -37,9 +44,12 @@ app.use(
     credentials: true,
   }),
 );
-//increase body size limit
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
+// ✅ 4. BODY PARSER (⚠️ reduce limit!)
+app.use(express.json({ limit: "10kb" }));
+app.use(express.urlencoded({ limit: "10kb", extended: true }));
+
+// ✅ 5. COOKIES
 app.use(cookieParser());
 
 // routes
