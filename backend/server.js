@@ -24,44 +24,55 @@ app.use(helmet());
 // ✅ 2. PREVENT MONGO INJECTION
 app.use(mongoSanitize());
 
-// ✅ 3. CORS (keep your config)
+// ✅ 3. CORS FIXED
 const allowedOrigins = [
-  process.env.CLIENT_URL,
+  process.env.CLIENT_URL || "https://www.ematsproject.store",
   "https://www.ematsproject.store",
+  "https://ematsproject.store", // in case someone hits non-www
 ];
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
+// Custom CORS function
+const corsOptions = {
+  origin: function (origin, callback) {
+    // allow requests with no origin (curl, Postman)
+    if (!origin) return callback(null, true);
 
-      if (origin.includes("localhost")) return callback(null, true);
-      if (origin.endsWith(".vercel.app")) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
+    // allow localhost for development
+    if (origin.includes("localhost")) return callback(null, true);
 
-      return callback(new Error("Not allowed by CORS"));
-    },
-    credentials: true,
-  }),
-);
+    // allow Vercel deployments
+    if (origin.endsWith(".vercel.app")) return callback(null, true);
 
-// ✅ 4. BODY PARSER (⚠️ reduce limit!)
+    // allow whitelisted domains
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+
+    // reject all others
+    return callback(new Error(`CORS policy: ${origin} not allowed`));
+  },
+  credentials: true, // allows cookies to be sent
+};
+
+app.use(cors(corsOptions));
+
+// ✅ 4. BODY PARSER
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ limit: "10kb", extended: true }));
 
 // ✅ 5. COOKIES
 app.use(cookieParser());
 
-// routes
+// ✅ 6. ROUTES
 app.use("/api/properties", propertyRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/inquiries", inquiryRoutes);
 app.use("/api/agents", agentRoutes);
 
+// ✅ 7. HEALTH CHECK
 app.get("/health", (req, res) => {
   res.status(200).send("OK");
 });
 
+// ✅ 8. START SERVER
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   connectDB();
