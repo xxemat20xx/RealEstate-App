@@ -14,19 +14,6 @@ import {
 
 import { verifyToken, adminOnly } from "../middleware/verifyToken.js";
 
-import {
-  registerSchema,
-  loginSchema,
-  verifyOtpSchema,
-  forgotPasswordSchema,
-  resetPasswordSchema,
-} from "../schemas/auth.schema.js";
-
-// import { validate } from "../middleware/validate.middleware.js";
-
-// limitter
-// import { forgotPasswordLimiter } from "../middleware/rateLimiter.js";
-
 const userRoutes = express.Router();
 
 userRoutes.post("/register", register);

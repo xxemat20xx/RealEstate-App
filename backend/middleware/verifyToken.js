@@ -4,19 +4,23 @@ import { User } from "../models/user.model.js";
 export const verifyToken = (req, res, next) => {
   const token = req.cookies.accessToken;
 
+  console.log("Token from cookie:", token);
+
+  if (!token) {
+    return res.status(401).json({
+      message: "Unauthorized, token missing",
+      success: false,
+    });
+  }
+
   try {
-    if (!token) {
-      return res
-        .status(400)
-        .json({ message: "Unauthorize, token missing. ", success: false });
-    }
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.userId = decoded.userId;
     next();
   } catch (error) {
-    next(error);
     console.log("Error in verifying token", error);
-    return res.status(500).json({
+
+    return res.status(401).json({
       success: false,
       message: "Unauthorized, invalid token",
     });

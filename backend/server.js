@@ -2,8 +2,6 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import helmet from "helmet";
-import mongoSanitize from "express-mongo-sanitize";
 
 import { connectDB } from "./lib/db.js";
 
@@ -18,29 +16,29 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ 1. SECURITY HEADERS
-app.use(helmet());
-
-// ✅ 2. PREVENT MONGO INJECTION
-app.use(mongoSanitize());
-
 // ✅ 3. CORS (keep your config)
-const allowedOrigins = [
-  process.env.CLIENT_URL,
-  "https://www.ematsproject.store",
-];
+// const allowedOrigins = [
+//   process.env.CLIENT_URL,
+//   "https://www.ematsproject.store",
+// ];
 
+// app.use(
+//   cors({
+//     origin: function (origin, callback) {
+//       if (!origin) return callback(null, true);
+
+//       if (origin.includes("localhost")) return callback(null, true);
+//       if (origin.endsWith(".vercel.app")) return callback(null, true);
+//       if (allowedOrigins.includes(origin)) return callback(null, true);
+
+//       return callback(new Error("Not allowed by CORS"));
+//     },
+//     credentials: true,
+//   }),
+// );
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
-
-      if (origin.includes("localhost")) return callback(null, true);
-      if (origin.endsWith(".vercel.app")) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-
-      return callback(new Error("Not allowed by CORS"));
-    },
+    origin: "http://localhost:5173",
     credentials: true,
   }),
 );

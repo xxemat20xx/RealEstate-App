@@ -52,7 +52,7 @@ const userSchema = new mongoose.Schema(
     refreshToken: {
       type: [String],
       default: [],
-      select: false, // 🔥 hide from API
+      select: false,
     },
 
     isVerified: {
