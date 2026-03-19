@@ -16,29 +16,20 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ✅ 3. CORS (keep your config)
-// const allowedOrigins = [
-//   process.env.CLIENT_URL,
-//   "https://www.ematsproject.store",
-// ];
+const allowedOrigins = [
+  process.env.CLIENT_URL, // should be http://localhost:5173 in dev
+  "https://www.ematsproject.store",
+];
 
-// app.use(
-//   cors({
-//     origin: function (origin, callback) {
-//       if (!origin) return callback(null, true);
-
-//       if (origin.includes("localhost")) return callback(null, true);
-//       if (origin.endsWith(".vercel.app")) return callback(null, true);
-//       if (allowedOrigins.includes(origin)) return callback(null, true);
-
-//       return callback(new Error("Not allowed by CORS"));
-//     },
-//     credentials: true,
-//   }),
-// );
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true); // postman or same-origin
+      if (origin.includes("localhost")) return callback(null, true);
+      if (origin.endsWith(".vercel.app")) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   }),
 );
